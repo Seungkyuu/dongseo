@@ -109,16 +109,16 @@ const TRUST_STATS: { num: string; unit: string; label: string }[] = [
 
 const RENTO_FEATURES: { title: string; desc: string }[] = [
   {
-    title: "함께 걷는 견적 비교",
-    desc: "여러 금융사 견적을 한 번에 모아서 보여드려요. 혼자 알아보지 않아도, 서동이 옆에서 같이 비교해요.",
+    title: "실시간 최저가 비교",
+    desc: "여러 금융사 견적을 한 번에 모아 비교합니다. 오늘 확인한 가격, 내일도 유효한 최신가예요.",
   },
   {
     title: "숨김 없는 계산 근거",
     desc: "잔존가치·초기 비용·총 납부액까지 전부 펼쳐서 보여드려요. 눌러야 나오는 작은 글씨는 없어요.",
   },
   {
-    title: "계약 이후에도 동행",
-    desc: "계약서에 도장 찍는 순간으로 끝나지 않아요. 차량 생애주기 내내 편하게 물어보세요.",
+    title: "계약 이후까지 책임지는 동행",
+    desc: "만기·재계약 시점, 서동이 먼저 연락드립니다. 계약은 끝이 아니라 관계의 시작이에요.",
   },
 ];
 
@@ -1061,7 +1061,7 @@ export default function QuoteApp() {
           <div className="landing-inner">
             <div className="landing-hero-row">
               <h1>
-                차량 생애주기를 <em>함께 걷는 동행자</em>
+                차량의 처음부터 끝까지, <em>서동이 함께합니다</em>
               </h1>
               <a
                 className="landing-hero-kakao"
@@ -1073,7 +1073,7 @@ export default function QuoteApp() {
               </a>
             </div>
             <p className="landing-hero-sub">
-              장기렌트·리스·법인 리스까지, 여러 금융사 견적을 실시간으로 비교해 최저가를 확인합니다. 계약 이후에도 서동이 함께합니다
+              장기렌트·리스·법인 리스까지, 여러 금융사 견적을 실시간으로 비교해 최저가를 확인합니다. 계약 이후, 진짜 서동의 역할이 시작됩니다
             </p>
             <form
               className="landing-search"
@@ -1120,8 +1120,8 @@ export default function QuoteApp() {
           <div className="landing-inner">
             <div className="landing-sec-head">
               <div>
-                <h2>서동과 함께 걷는 여정</h2>
-                <p className="landing-sec-desc">계약은 끝이 아니라 시작이에요 — 세 단계 모두 같이합니다</p>
+                <h2>서동의 동행 3단계</h2>
+                <p className="landing-sec-desc">비교로 끝나는 서비스가 아니라, 계약 이후까지 책임지는 파트너십입니다</p>
               </div>
             </div>
             <ol className="journey-steps">
@@ -1269,7 +1269,7 @@ export default function QuoteApp() {
 
         <section className="landing-section landing-features landing-features-compact">
           <div className="landing-inner">
-            <p className="landing-mini-label">왜 서동인가 · 서로 + 동행, 끝까지 함께하는 비교 계산기입니다</p>
+            <p className="landing-mini-label">왜 서동인가 · 비교로 끝나지 않는 유일한 파트너</p>
             <div className="landing-feature-list">
               {RENTO_FEATURES.map((f) => (
                 <div key={f.title} className="landing-feature-item">
