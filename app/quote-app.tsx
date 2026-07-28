@@ -104,18 +104,20 @@ const COMPANY_LEGAL = "이준성 대표 · 서울특별시 강서구 마곡중�
  *  "업력 10년+"·"누적 계약 3,400건"·"만족도 98%" 같은 수치를 쓸 수 없다
  *  (RENTO에서 복사돼 왔던 값이라 전부 제거). 취급 차량/브랜드 수는 실제
  *  인덱스에서 그 자리에서 세고, 제휴 금융사 3곳도 실제 연동된 수다. */
+/** 문구는 실제로 하는 것만 쓴다 — "유일한 파트너"(검증 불가한 최상급),
+ *  "내일도 유효한 최신가"(보장 불가한 약속) 같은 표현은 제거. */
 const RENTO_FEATURES: { title: string; desc: string }[] = [
   {
-    title: "실시간 최저가 비교",
-    desc: "여러 금융사 견적을 한 번에 모아 비교합니다. 오늘 확인한 가격, 내일도 유효한 최신가예요.",
+    title: "혼자 알아보지 않아도 됩니다",
+    desc: "여러 금융사 견적을 한 번에 모아 비교해드려요. 어디에 물어봐야 할지부터 고민하지 않으셔도 돼요.",
   },
   {
     title: "숨김 없는 계산 근거",
     desc: "잔존가치·초기 비용·총 납부액까지 전부 펼쳐서 보여드려요. 눌러야 나오는 작은 글씨는 없어요.",
   },
   {
-    title: "계약 이후까지 책임지는 동행",
-    desc: "만기·재계약 시점, 서동이 먼저 연락드립니다. 계약은 끝이 아니라 관계의 시작이에요.",
+    title: "계약 이후에도 이어집니다",
+    desc: "계약 기간 중 문의는 언제든, 만기·재계약 시점엔 서동이 먼저 연락드려요.",
   },
 ];
 
@@ -328,18 +330,36 @@ function TopBar({ title }: { title: string }) {
  * 보이므로, 이런 자리엔 로고(정사각 아이콘)를 쓰고 차량 실사진은
  * 공간이 넉넉한 결과 화면 히어로에서만 크게 보여준다.
  */
+/**
+ * 서버에서 그린 <img>가 하이드레이션 전에 이미 실패하면 React의 onError가
+ * 영영 안 불린다(리스너를 붙이기 전에 에러가 지나감) — 그래서 화면엔
+ * 깨진 이미지 아이콘만 남는다. 마운트 직후 naturalWidth로 실제 로드
+ * 여부를 다시 확인해서 폴백을 강제로 태운다.
+ */
+function useBrokenImage(src: string | undefined) {
+  const ref = useRef<HTMLImageElement>(null);
+  const [broken, setBroken] = useState(false);
+  useEffect(() => {
+    setBroken(false);
+    const el = ref.current;
+    if (src && el && el.complete && el.naturalWidth === 0) setBroken(true);
+  }, [src]);
+  return { ref, broken, markBroken: () => setBroken(true) };
+}
+
 function BrandLogo({ brand, size = "sm" }: { brand: string; size?: "sm" | "lg" }) {
-  const [failed, setFailed] = useState(false);
   const src = logoForBrand(brand);
-  if (src && !failed) {
+  const { ref, broken, markBroken } = useBrokenImage(src);
+  if (src && !broken) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
+        ref={ref}
         className={`brand-logo brand-logo-${size}`}
         src={src}
         alt={brand}
         loading="lazy"
-        onError={() => setFailed(true)}
+        onError={markBroken}
       />
     );
   }
@@ -360,18 +380,18 @@ function BrandLogo({ brand, size = "sm" }: { brand: string; size?: "sm" | "lg" }
  * 경험이라, 항상 뭔가는 보이게 한다.
  */
 function VehiclePhoto({ brand, src }: { brand: string; src?: string }) {
-  const [failed, setFailed] = useState(false);
-  const showPhoto = src && !failed;
+  const { ref, broken, markBroken } = useBrokenImage(src);
   return (
     <div className="veh-photo-stage">
-      {showPhoto ? (
+      {src && !broken ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
+          ref={ref}
           className="veh-photo"
           src={src}
           alt={brand}
           loading="lazy"
-          onError={() => setFailed(true)}
+          onError={markBroken}
         />
       ) : (
         <BrandLogo brand={brand} size="lg" />
@@ -1316,7 +1336,7 @@ export default function QuoteApp() {
 
         <section className="landing-section landing-features landing-features-compact">
           <div className="landing-inner">
-            <p className="landing-mini-label">왜 서동인가 · 비교로 끝나지 않는 유일한 파트너</p>
+            <p className="landing-mini-label">왜 서동인가 · 비교로 끝나지 않습니다</p>
             <div className="landing-feature-list">
               {RENTO_FEATURES.map((f) => (
                 <div key={f.title} className="landing-feature-item">
