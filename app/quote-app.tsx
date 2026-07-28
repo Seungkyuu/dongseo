@@ -96,9 +96,9 @@ const BUDGET_PRESETS = [500_000, 700_000, 1_000_000, 1_500_000];
 const KAKAO_URL = "https://open.kakao.com/o/sQJ56vFi";
 const BLOG_URL = "https://blog.naver.com/leenkim_lease_";
 
-/** 사업자등록증 확정 전 임시값 — 대표자명·사업자등록번호 확인되는 대로 교체 */
+/** 사업자등록증 원본 기준(등록번호 309-86-04116) */
 const COMPANY_NAME = "주식회사 서동";
-const COMPANY_LEGAL = "대표자명 확인 중 · 사업자등록번호 확인 중";
+const COMPANY_LEGAL = "이준성 대표 · 서울특별시 강서구 마곡중앙6로 10, 203-23호 · 사업자등록번호 309-86-04116";
 
 const TRUST_STATS: { num: string; unit: string; label: string }[] = [
   { num: "10", unit: "년+", label: "업력" },
@@ -199,12 +199,9 @@ function makeQuoteNumber(): string {
 // ─── 공용 소품 ────────────────────────────────────────────────────────────────
 
 /**
- * 로고 마크 — 원형 배지 + R 모노그램. 대표님이 공유한 CI 시안(원형 링 +
- * R/U 모노그램, 딥네이비 × 실버 × 청록 포인트, 링 아래 작은 원 디테일)의
- * 구도를 그대로 따르되, 벡터로 다시 그렸다 — 원본은 채팅에 붙여넣기된
- * 이미지라 파일로 못 가져왔고(포토리얼 크롬 렌더는 파비콘 같은 작은
- * 크기에서도 잘 안 뭉개지는 평면 벡터가 실사용에도 더 낫다). 실제
- * 로고 파일을 파일로 첨부해주시면 이 자리에 그대로 교체 가능하다.
+ * 로고 마크 — 두 갈래 길이 만나 하나로 합류하는 모양. "서로 + 동행"
+ * (서동) 컨셉을 도상화 — 각자 다른 자리에서 출발한 두 선이 원 안에서
+ * 하나로 이어져 함께 내려간다.
  */
 function LogoMark({ size = 26 }: { size?: number }) {
   return (
@@ -218,13 +215,20 @@ function LogoMark({ size = 26 }: { size?: number }) {
     >
       <circle cx="20" cy="19" r="17" stroke="currentColor" strokeWidth="2.25" />
       <path
-        d="M15 12.5h6.2a4.6 4.6 0 0 1 0 9.2h-2.6l6 6.3"
+        d="M12.5,12.5 C12.5,19 15.7,22.1 20,24"
         stroke="currentColor"
         strokeWidth="2.6"
         strokeLinecap="round"
-        strokeLinejoin="round"
+        fill="none"
       />
-      <path d="M15 12.5v15.5" className="logo-mark-accent" strokeWidth="2.6" strokeLinecap="round" />
+      <path
+        d="M27.5,12.5 C27.5,19 24.3,22.1 20,24"
+        className="logo-mark-accent"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path d="M20,24 L20,31" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
       <circle cx="20" cy="34.5" r="1.5" fill="currentColor" />
     </svg>
   );
