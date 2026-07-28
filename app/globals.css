@@ -1006,6 +1006,24 @@ input:focus, select:focus { outline: 2px solid var(--navy); outline-offset: 1px;
 }
 .landing-hero-chips { margin-top: 14px; }
 
+.landing-hero-badges { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 10px 0 16px; }
+.landing-hero-badges span {
+  font-size: 12px; color: var(--ink-soft); font-weight: 600;
+  padding: 4px 0; position: relative;
+}
+.landing-hero-badges span + span { padding-left: 16px; }
+.landing-hero-badges span + span::before {
+  content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 3px; border-radius: 50%; background: var(--rule-strong, var(--rule));
+}
+
+.landing-howto { display: flex; gap: 18px; list-style: none; margin: 16px 0 0; padding: 0; flex-wrap: wrap; }
+.landing-howto li { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-soft); }
+.landing-howto b {
+  width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
+  font-size: 10.5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
 .landing-kakao-btn {
   display: block;
   background: #FEE500; color: #191600; font-weight: 700; font-size: 13px;
@@ -1053,7 +1071,7 @@ input:focus, select:focus { outline: 2px solid var(--navy); outline-offset: 1px;
   margin: 0;
   padding: 0;
 }
-.journey-steps li {
+.journey-steps > li {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -1077,6 +1095,11 @@ input:focus, select:focus { outline: 2px solid var(--navy); outline-offset: 1px;
 }
 .journey-steps b { font-size: 15px; color: var(--navy-ink); }
 .journey-steps span:not(.journey-step-no) { font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; }
+.journey-steps ul {
+  margin: 6px 0 0; padding-left: 16px; list-style: disc;
+  border-top: 1px solid var(--rule); padding-top: 8px;
+}
+.journey-steps ul li { font-size: 11.5px; color: var(--ink-soft); line-height: 1.6; }
 @media (max-width: 640px) {
   .journey-steps { grid-template-columns: 1fr; }
 }
@@ -1118,6 +1141,7 @@ input:focus, select:focus { outline: 2px solid var(--navy); outline-offset: 1px;
 .landing-spread-muted { color: var(--ink-faint) !important; font-weight: 600 !important; }
 
 .landing-model-name { font-size: 14px; font-weight: 800; padding: 0 12px; margin-top: 2px; }
+.landing-model-cond { display: block; font-size: 10.5px; color: var(--ink-soft); padding: 2px 12px 0; }
 .landing-model-price { font-size: 12px; color: var(--ink-soft); padding: 4px 12px 2px; }
 .landing-model-price b { color: var(--navy-ink); font-size: 14px; }
 .landing-model-spread { display: block; font-size: 10.5px; font-weight: 700; color: var(--accent); padding: 0 12px 12px; }
@@ -1131,6 +1155,20 @@ input:focus, select:focus { outline: 2px solid var(--navy); outline-offset: 1px;
 .landing-contact-bar-meta { font-size: 11.5px; color: var(--ink-faint); margin: 5px 0 0; }
 .landing-contact-bar-meta a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
 .landing-contact-bar-btns { display: flex; gap: 8px; flex-shrink: 0; }
+
+.faq-list { display: flex; flex-direction: column; gap: 0; max-width: 720px; }
+.faq-list details {
+  border-bottom: 1px solid var(--rule); padding: 14px 0;
+}
+.faq-list details:first-child { border-top: 1px solid var(--rule); }
+.faq-list summary {
+  cursor: pointer; font-size: 14px; font-weight: 700; color: var(--navy-ink);
+  list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.faq-list summary::-webkit-details-marker { display: none; }
+.faq-list summary::after { content: "+"; font-weight: 400; color: var(--ink-soft); font-size: 18px; flex-shrink: 0; }
+.faq-list details[open] summary::after { content: "−"; }
+.faq-list p { margin: 10px 0 0; font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
 
 .landing-footer { background: var(--paper); border-top: 1px solid var(--rule); padding: 22px 20px; }
 .landing-footer-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--ink-faint); }

@@ -93,7 +93,7 @@ function customerReason(note?: string): string {
 const POPULAR_QUERIES = ["그랜저", "E 300", "Model Y", "G80", "Dolphin"];
 const BUDGET_PRESETS = [500_000, 700_000, 1_000_000, 1_500_000];
 
-const KAKAO_URL = "https://open.kakao.com/o/sQJ56vFi";
+const KAKAO_URL = "https://open.kakao.com/o/s2R3r8Fi";
 const BLOG_URL = "https://blog.naver.com/leenkim_lease_";
 
 /** 사업자등록증 원본 기준(등록번호 309-86-04116) */
@@ -1075,6 +1075,11 @@ export default function QuoteApp() {
             <p className="landing-hero-sub">
               장기렌트·리스·법인 리스까지, 여러 금융사 견적을 실시간으로 비교해 최저가를 확인합니다. 계약 이후, 진짜 서동의 역할이 시작됩니다
             </p>
+            <div className="landing-hero-badges">
+              <span>취급 차량 {index.length.toLocaleString("ko-KR")}+</span>
+              <span>취급 브랜드 {brands.length}개</span>
+              <span>제휴 금융사 3곳</span>
+            </div>
             <form
               className="landing-search"
               onSubmit={(e) => {
@@ -1113,6 +1118,11 @@ export default function QuoteApp() {
                 +{Math.max(brands.length - 8, 0)}개 브랜드
               </button>
             </div>
+            <ol className="landing-howto">
+              <li><b>1</b>검색 — 차명으로 바로 찾기</li>
+              <li><b>2</b>비교 — 여러 금융사 견적을 한눈에</li>
+              <li><b>3</b>상담 — 오픈카톡으로 조건 확정</li>
+            </ol>
           </div>
         </section>
 
@@ -1129,16 +1139,28 @@ export default function QuoteApp() {
                 <span className="journey-step-no">1</span>
                 <b>비교</b>
                 <span>여러 금융사 견적을 실시간으로 모아서 보여드려요. 혼자 알아보지 않아도 돼요.</span>
+                <ul>
+                  <li>잔존가치·초기 비용·총 납부액까지 계산 근거 전체 공개</li>
+                  <li>리스·렌트 상품을 조건별로 한 화면에서 비교</li>
+                </ul>
               </li>
               <li>
                 <span className="journey-step-no">2</span>
                 <b>계약</b>
                 <span>조건이 정해지면 서류 준비부터 인도까지, 헷갈리는 부분을 같이 짚어드려요.</span>
+                <ul>
+                  <li>오픈카톡으로 필요 서류·일정 안내</li>
+                  <li>계약서 조항 중 궁금한 부분 바로 질문 가능</li>
+                </ul>
               </li>
               <li>
                 <span className="journey-step-no">3</span>
                 <b>동행</b>
                 <span>계약이 끝난 뒤에도 만기·재계약 시점에 서동이 먼저 연락드려요.</span>
+                <ul>
+                  <li>만기·재계약 시점에 먼저 연락</li>
+                  <li>계약 기간 중 문의는 언제든 오픈카톡으로</li>
+                </ul>
               </li>
             </ol>
           </div>
@@ -1209,7 +1231,7 @@ export default function QuoteApp() {
                     지금 많이 찾는 모델
                   </p>
                   <div className="landing-model-grid">
-                    {popularCards.map(({ vehicle: v, monthlyPayment, spread, sourceCount }) => (
+                    {popularCards.map(({ vehicle: v, deal, monthlyPayment, spread, sourceCount }) => (
                       <button
                         key={v.id}
                         type="button"
@@ -1221,6 +1243,7 @@ export default function QuoteApp() {
                         </span>
                         <VehiclePhoto brand={v.brand} src={v.image} />
                         <span className="landing-model-name">{v.display}</span>
+                        <span className="landing-model-cond">{DEAL_EXPLAIN[deal].name} · 48개월</span>
                         <span className="landing-model-price">
                           월 <b>{won(monthlyPayment)}</b>원부터
                         </span>
@@ -1296,6 +1319,50 @@ export default function QuoteApp() {
                 <div className="landing-stat-label">{s.label}</div>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="landing-section landing-faq">
+          <div className="landing-inner">
+            <div className="landing-sec-head">
+              <div>
+                <h2>자주 묻는 질문</h2>
+              </div>
+            </div>
+            <div className="faq-list">
+              <details>
+                <summary>이용료가 있나요?</summary>
+                <p>아니요, 견적 비교와 상담 모두 무료예요. 계약 시에도 별도 수수료를 서동에 내지 않아요.</p>
+              </details>
+              <details>
+                <summary>최저가는 어떻게 찾나요?</summary>
+                <p>
+                  차량을 고르면 제휴 금융사 견적을 실시간으로 계산해서 비교해요. 어제 시세가 아니라
+                  항상 최신 조건 기준이고, 잔존가치·초기 비용까지 계산 근거를 그대로 보여드려요.
+                </p>
+              </details>
+              <details>
+                <summary>왜 금융사 이름이 바로 안 보이나요?</summary>
+                <p>
+                  비교 단계에서는 회사 이름보다 조건(월 납부액·잔가율·총 납부액)에 집중하실 수 있게
+                  A/B/C사로 표기해요. 실제 회사명은 상담 시 정확히 안내드려요.
+                </p>
+              </details>
+              <details>
+                <summary>상담은 어떻게 진행되나요?</summary>
+                <p>
+                  오픈카톡으로 편하게 문의하시면 담당 컨설턴트가 조건을 확인하고 다음 단계를
+                  안내해드려요. 전화보다 부담 없이, 원하는 시간에 물어보실 수 있어요.
+                </p>
+              </details>
+              <details>
+                <summary>계약 이후에도 도와주나요?</summary>
+                <p>
+                  네, 서동의 정체성이 바로 그 부분이에요. 계약이 끝난 뒤에도 만기·재계약 시점에
+                  서동이 먼저 연락드려요.
+                </p>
+              </details>
+            </div>
           </div>
         </section>
 
