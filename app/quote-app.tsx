@@ -177,16 +177,27 @@ const INSTANT_DELIVERY_TESLA: {
   },
 ];
 
-/** 랜딩 "인기 모델" — 고정 4개(브랜드+모델그룹). buildModelGroups()/
- *  quoteIndexed()로 그 자리에서 실시간 계산한다. "동행" 컨셉에 맞춰
- *  가족·장거리 동승에 어울리는 차종으로 골랐다(탑고/RENTO의 세단·프리미엄
- *  위주 셀렉션과 겹치지 않게 의도적으로 다르게 구성). */
-const POPULAR_TARGETS: { brand: string; group: string }[] = [
+/** "목적별 추천 차량" — 고객이 실제로 찾는 이유(가족·법인·출퇴근)로
+ *  카테고리를 나눈다. 각 후보군(POOL)은 "이 카테고리에 어울리는 차종"을
+ *  사람이 큐레이션한 목록이고, 그 안에서 실제 3위까지는 그 자리에서
+ *  실시간 계산(bestLandingQuote)한 최저가 순으로 뽑는다 — 고정된 3개를
+ *  박아둔 게 아니라 후보군이 늘어나면 순위도 바뀐다. */
+const FAMILY_POOL: { brand: string; group: string }[] = [
   { brand: "현대", group: "싼타페" },
   { brand: "현대", group: "팰리세이드" },
+  { brand: "현대", group: "투싼" },
   { brand: "현대", group: "아이오닉6" },
   { brand: "제네시스", group: "GV70" },
 ];
+const BUSINESS_LEASE_POOL: { brand: string; group: string }[] = [
+  { brand: "현대", group: "그랜저" },
+  { brand: "제네시스", group: "G80" },
+  { brand: "BMW", group: "5시리즈" },
+  { brand: "벤츠", group: "E-클래스" },
+];
+/** 출퇴근 Hybrid — 고정 후보군이 아니라 원본 라벨에 "하이브리드/HEV/Hybrid"가
+ *  실제로 포함된 트림만 걸러낸다(엑셀 원본 표기 그대로 검사, 허구 아님). */
+const HYBRID_LABEL_RE = /하이브리드|HEV\b|Hybrid/i;
 
 type Screen = "landing" | "home" | "budget" | "result" | "quote-doc";
 
@@ -923,7 +934,9 @@ export default function QuoteApp() {
     return null;
   }
 
-  function groupTargetCards(targets: { brand: string; group: string }[]) {
+  /** 후보군(POOL) 안에서 실시간 최저가 top N을 뽑는다 — 고정 순서가
+   *  아니라 계산된 가격 오름차순. */
+  function rankPool(targets: { brand: string; group: string }[], limit = 3) {
     const cards: {
       vehicle: IndexedVehicle;
       deal: DealType;
@@ -939,7 +952,7 @@ export default function QuoteApp() {
       const q = bestLandingQuote(v);
       if (q) cards.push({ vehicle: v, ...q });
     }
-    return cards;
+    return cards.sort((a, b) => a.monthlyPayment - b.monthlyPayment).slice(0, limit);
   }
 
   const instantDeliveryCards = useMemo(() => {
@@ -964,7 +977,28 @@ export default function QuoteApp() {
       return { ...item, monthlyPayment, residualRate, image: group?.image };
     }).filter((c): c is NonNullable<typeof c> => !!c);
   }, [groups]);
-  const popularCards = useMemo(() => groupTargetCards(POPULAR_TARGETS), [groups]);
+  const familyCards = useMemo(() => rankPool(FAMILY_POOL), [groups]);
+  const businessCards = useMemo(() => rankPool(BUSINESS_LEASE_POOL), [groups]);
+  const hybridCards = useMemo(() => {
+    const seen = new Set<string>();
+    const cards: {
+      vehicle: IndexedVehicle;
+      deal: DealType;
+      monthlyPayment: number;
+      residualRate?: number;
+      spread: number;
+      sourceCount: number;
+    }[] = [];
+    for (const v of index) {
+      if (seen.has(v.modelGroup)) continue;
+      if (!v.refs.some((r) => HYBRID_LABEL_RE.test(r.model))) continue;
+      const q = bestLandingQuote(v);
+      if (!q) continue;
+      seen.add(v.modelGroup);
+      cards.push({ vehicle: v, ...q });
+    }
+    return cards.sort((a, b) => a.monthlyPayment - b.monthlyPayment).slice(0, 3);
+  }, [index]);
 
   function goToSearch(q?: string) {
     if (q !== undefined) setSearchQuery(q);
@@ -1166,12 +1200,15 @@ export default function QuoteApp() {
           </div>
         </section>
 
-        {(instantDeliveryCards.length > 0 || popularCards.length > 0) && (
+        {(instantDeliveryCards.length > 0 ||
+          familyCards.length > 0 ||
+          businessCards.length > 0 ||
+          hybridCards.length > 0) && (
           <section className="landing-section">
             <div className="landing-inner">
               <div className="landing-sec-head">
                 <div>
-                  <h2>이달의 추천 차량</h2>
+                  <h2>목적별 추천 차량</h2>
                   <p className="landing-sec-desc">
                     48개월 · 보증금 30% 기준 실시간 계산가 · 클릭하면 트림 선택 → 최저가 비교로 이동
                   </p>
@@ -1224,38 +1261,46 @@ export default function QuoteApp() {
                 </div>
               )}
 
-              {popularCards.length > 0 && (
-                <div className="landing-row-block">
-                  <p className="landing-row-label">
-                    <span className="landing-tag">인기 모델</span>
-                    지금 많이 찾는 모델
-                  </p>
-                  <div className="landing-model-grid">
-                    {popularCards.map(({ vehicle: v, deal, monthlyPayment, spread, sourceCount }) => (
-                      <button
-                        key={v.id}
-                        type="button"
-                        className="landing-model-card"
-                        onClick={() => pickVehicle(v)}
-                      >
-                        <span className="landing-model-badge">
-                          {sourceCount > 1 ? `${sourceCount}사 비교` : "단독 취급"}
-                        </span>
-                        <VehiclePhoto brand={v.brand} src={v.image} />
-                        <span className="landing-model-name">{v.display}</span>
-                        <span className="landing-model-cond">{DEAL_EXPLAIN[deal].name} · 48개월</span>
-                        <span className="landing-model-price">
-                          월 <b>{won(monthlyPayment)}</b>원부터
-                        </span>
-                        {spread > 0 ? (
-                          <span className="landing-model-spread">최대 {won(spread)}원 차이</span>
-                        ) : (
-                          <span className="landing-model-spread landing-spread-muted">비교 대상 없음</span>
-                        )}
-                      </button>
-                    ))}
+              {(
+                [
+                  ["패밀리카 TOP3", "가족·장거리 동승에 어울리는 SUV·대형 세단", familyCards],
+                  ["비즈니스 리스 TOP3", "법인 차량으로 많이 찾는 프리미엄 세단 · 운용·금융리스", businessCards],
+                  ["출퇴근 Hybrid TOP3", "실제 하이브리드·HEV 트림만 걸러낸 순위", hybridCards],
+                ] as const
+              ).map(([label, desc, items]) =>
+                items.length > 0 ? (
+                  <div className="landing-row-block" key={label}>
+                    <p className="landing-row-label">
+                      <span className="landing-tag">{label}</span>
+                      {desc}
+                    </p>
+                    <div className="landing-model-grid">
+                      {items.map(({ vehicle: v, deal, monthlyPayment, spread, sourceCount }, i) => (
+                        <button
+                          key={`${label}-${v.id}`}
+                          type="button"
+                          className="landing-model-card"
+                          onClick={() => pickVehicle(v)}
+                        >
+                          <span className="landing-model-badge">
+                            {i + 1}위 · {sourceCount > 1 ? `${sourceCount}사 비교` : "단독 취급"}
+                          </span>
+                          <VehiclePhoto brand={v.brand} src={v.image} />
+                          <span className="landing-model-name">{v.display}</span>
+                          <span className="landing-model-cond">{DEAL_EXPLAIN[deal].name} · 48개월</span>
+                          <span className="landing-model-price">
+                            월 <b>{won(monthlyPayment)}</b>원부터
+                          </span>
+                          {spread > 0 ? (
+                            <span className="landing-model-spread">최대 {won(spread)}원 차이</span>
+                          ) : (
+                            <span className="landing-model-spread landing-spread-muted">비교 대상 없음</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                ) : null,
               )}
             </div>
           </section>

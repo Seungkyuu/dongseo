@@ -1,31 +1,30 @@
 /*
- * RENTO 디자인 시스템 — "정밀 계기판(precision instrument)" 미학.
+ * 서동 디자인 시스템 — "따뜻한 동행(warm companion)" 미학. RENTO의 차가운
+ * 네이비+청록 계기판 톤에서 벗어나, "서로+동행" 컨셉에 맞는 베이지·사지
+ * 계열 웜톤으로 새로 짰다.
  *
- *   · 딥 네이비(주 색) × 메탈릭 실버(보조·괘선) × 화이트(지면) — RENTO
- *     로고 아이덴티티 그대로.
- *   · 장식 대신 여백과 헤어라인 — 그림자·그라디언트 카드 대신 얇은 테두리
- *     패널. "AI가 만든 티" 나는 과한 장식을 피하고 절제된 정보 위계로
- *     신뢰를 준다.
- *   · 단 하나의 강조색(청록 accent)만 "최저가"처럼 진짜 중요한 지점에
- *     쓴다 — 로고 워드마크의 청록 스트로크에서 가져온 색.
- *   · 워드마크는 굵은 산세리프 RENTO + 얇은 헤어라인 밑줄.
+ *   · 웜 베이지(지면) × 딥 브라운(주 색·상호작용) × 코랄(강조) — 여행·동행의
+ *     따뜻함을 색으로 전달.
+ *   · 장식 대신 여백과 헤어라인 — RENTO와 같은 절제된 레이아웃 원칙은
+ *     유지하되 팔레트만 서동 전용으로 교체.
+ *   · 단 하나의 강조색(코랄 accent)만 "최저가"처럼 진짜 중요한 지점에 쓴다.
  */
 
 :root {
-  --paper: #ffffff;                    /* 지면 — 순백 */
-  --panel: #ffffff;                    /* 패널 표면 (지면과 같아 헤어라인 테두리로만 구분) */
-  --panel-2: #f1f3f6;                  /* 보조 표면 (상세 명세부) */
-  --rule: #dde1e7;                     /* 괘선 — 실버 */
-  --rule-strong: #0f2044;              /* 강한 괘선 (헤더 밑줄) */
-  --ink: #10182b;                      /* 본문 잉크 — 네이비블랙 */
-  --ink-soft: #475569;                 /* 명암비 ~8:1 (흰 배경) */
-  --ink-faint: #64748b;                /* 명암비 ~4.6:1 — WCAG AA 통과 (기존 #98a0b2는 2.6:1로 미달) */
-  --navy: #0f2044;                     /* 주 상호작용 — 딥 네이비 */
-  --navy-ink: #060f24;
-  --accent: #1fb6c9;                   /* 단일 강조색 — 청록 (최저가 등) */
-  --accent-bg: rgba(31,182,201,0.08);
+  --paper: #f7f2ea;                    /* 지면 — 웜 베이지 */
+  --panel: #fdfbf7;                    /* 패널 표면 */
+  --panel-2: #f0e6d6;                  /* 보조 표면 (상세 명세부) */
+  --rule: #e3d5c0;                     /* 괘선 — 사지톤 */
+  --rule-strong: #4a3626;              /* 강한 괘선 (헤더 밑줄) */
+  --ink: #2c2116;                      /* 본문 잉크 — 웜 다크브라운 */
+  --ink-soft: #6b5843;                 /* 명암비 확보 (베이지 배경) */
+  --ink-faint: #8a7862;                /* WCAG AA 통과 */
+  --navy: #4a3626;                     /* 주 상호작용 — 딥 브라운(가죽·여행 가방 톤) */
+  --navy-ink: #2c2116;
+  --accent: #e0693f;                   /* 단일 강조색 — 코랄(따뜻함, 최저가 등) */
+  --accent-bg: rgba(224,105,63,0.1);
   --on-accent: #ffffff;
-  --bar: #0f2044;                      /* 하단 고정 바 */
+  --bar: #4a3626;                      /* 하단 고정 바 */
   /* 구 변수명(green/gold) 호환 */
   --green: var(--navy); --green-ink: var(--navy-ink);
   --gold: var(--accent); --gold-bg: var(--accent-bg);
@@ -38,39 +37,39 @@
  */
 :root[data-theme="light"] {
   color-scheme: light;
-  --paper: #ffffff;
-  --panel: #ffffff;
-  --panel-2: #f1f3f6;
-  --rule: #dde1e7;
-  --rule-strong: #0f2044;
-  --ink: #10182b;
-  --ink-soft: #475569;
-  --ink-faint: #64748b;
-  --navy: #0f2044;
-  --navy-ink: #060f24;
-  --accent: #1fb6c9;
-  --accent-bg: rgba(31,182,201,0.08);
+  --paper: #f7f2ea;
+  --panel: #fdfbf7;
+  --panel-2: #f0e6d6;
+  --rule: #e3d5c0;
+  --rule-strong: #4a3626;
+  --ink: #2c2116;
+  --ink-soft: #6b5843;
+  --ink-faint: #8a7862;
+  --navy: #4a3626;
+  --navy-ink: #2c2116;
+  --accent: #e0693f;
+  --accent-bg: rgba(224,105,63,0.1);
   --on-accent: #ffffff;
-  --bar: #0f2044;
+  --bar: #4a3626;
   --green: var(--navy); --green-ink: var(--navy-ink);
   --gold: var(--accent); --gold-bg: var(--accent-bg);
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --paper: #0b1120;
-  --panel: #121a2e;
-  --panel-2: #0e1526;
-  --rule: #263153;
-  --rule-strong: #c1c6cf;
-  --ink: #e7eaf2;
-  --ink-soft: #a6adc0;
-  --ink-faint: #7a87a8;
-  --navy: #6f8ade;
-  --navy-ink: #a9bcf2;
-  --accent: #3dd6e8;
-  --accent-bg: rgba(61,214,232,0.12);
-  --on-accent: #06101f;
-  --bar: #0b1120;
+  --paper: #1c1610;
+  --panel: #241c14;
+  --panel-2: #201911;
+  --rule: #3d3122;
+  --rule-strong: #d9c7ae;
+  --ink: #f0e6d8;
+  --ink-soft: #c4b39c;
+  --ink-faint: #96876f;
+  --navy: #e0a578;
+  --navy-ink: #f0d9be;
+  --accent: #ff8c5a;
+  --accent-bg: rgba(255,140,90,0.14);
+  --on-accent: #241407;
+  --bar: #1c1610;
   --green: var(--navy); --green-ink: var(--navy-ink);
   --gold: var(--accent); --gold-bg: var(--accent-bg);
 }

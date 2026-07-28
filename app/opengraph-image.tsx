@@ -16,8 +16,8 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          background: "#0f2044",
-          color: "#ffffff",
+          background: "#4a3626",
+          color: "#f7f2ea",
           fontFamily: "sans-serif",
         }}
       >
@@ -27,7 +27,7 @@ export default function OpengraphImage() {
               width: 56,
               height: 56,
               borderRadius: "50%",
-              border: "3px solid #ffffff",
+              border: "3px solid #f7f2ea",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -39,7 +39,7 @@ export default function OpengraphImage() {
           </div>
           <div style={{ display: "flex", fontSize: 44, fontWeight: 800, letterSpacing: -1 }}>
             <span>서</span>
-            <span style={{ color: "#3dd6e8" }}>동</span>
+            <span style={{ color: "#e0693f" }}>동</span>
           </div>
         </div>
         <div style={{ display: "flex", fontSize: 40, fontWeight: 800, marginTop: 48, lineHeight: 1.4 }}>
@@ -48,7 +48,7 @@ export default function OpengraphImage() {
         <div style={{ display: "flex", fontSize: 40, fontWeight: 800, lineHeight: 1.4 }}>
           여러 금융사 견적을 한 번에 비교
         </div>
-        <div style={{ display: "flex", fontSize: 24, color: "#a9bcf2", marginTop: 24 }}>
+        <div style={{ display: "flex", fontSize: 24, color: "#e0a578", marginTop: 24 }}>
           서동 — 함께 걷는 동행자
         </div>
       </div>
