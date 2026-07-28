@@ -178,12 +178,14 @@ const INSTANT_DELIVERY_TESLA: {
 ];
 
 /** 랜딩 "인기 모델" — 고정 4개(브랜드+모델그룹). buildModelGroups()/
- *  quoteIndexed()로 그 자리에서 실시간 계산한다. */
+ *  quoteIndexed()로 그 자리에서 실시간 계산한다. "동행" 컨셉에 맞춰
+ *  가족·장거리 동승에 어울리는 차종으로 골랐다(탑고/RENTO의 세단·프리미엄
+ *  위주 셀렉션과 겹치지 않게 의도적으로 다르게 구성). */
 const POPULAR_TARGETS: { brand: string; group: string }[] = [
-  { brand: "BMW", group: "3시리즈" },
-  { brand: "테슬라", group: "모델 Y" },
-  { brand: "현대", group: "그랜저" },
-  { brand: "제네시스", group: "G80" },
+  { brand: "현대", group: "싼타페" },
+  { brand: "현대", group: "팰리세이드" },
+  { brand: "현대", group: "아이오닉6" },
+  { brand: "제네시스", group: "GV70" },
 ];
 
 type Screen = "landing" | "home" | "budget" | "result" | "quote-doc";
@@ -765,7 +767,8 @@ function QuoteDocument({
 
         <p className="doc-disclaimer">
           차량가는 {priceDate} 기준 서동이 확인한 시세예요. 이 견적은 입력하신 조건 기준
-          예상 견적이며, 실제 계약 조건은 상담 시 확정돼요.
+          예상 견적이며, 실제 계약 조건은 상담 시 확정돼요. 계약 이후에도 서동은 동행합니다 —
+          만기·재계약 시점에 다시 연락드릴게요.
         </p>
       </div>
     </main>
@@ -788,9 +791,9 @@ function ConsultantCta() {
     <div className="cta-bar">
       <div className="cta-bar-text">
         <span className="cta-bar-title">
-          이 조건으로 상담받고 싶으신가요?
+          이 조건, 같이 정해봐요
         </span>
-        <span className="cta-bar-sub">담당 컨설턴트가 도와드려요</span>
+        <span className="cta-bar-sub">담당 컨설턴트가 끝까지 동행해드려요</span>
       </div>
       <a href={KAKAO_URL} target="_blank" rel="noopener noreferrer" className="cta-bar-btn">
         카카오톡 상담
