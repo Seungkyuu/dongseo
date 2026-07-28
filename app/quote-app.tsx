@@ -1116,6 +1116,34 @@ export default function QuoteApp() {
           </div>
         </section>
 
+        <section className="landing-section landing-journey">
+          <div className="landing-inner">
+            <div className="landing-sec-head">
+              <div>
+                <h2>서동과 함께 걷는 여정</h2>
+                <p className="landing-sec-desc">계약은 끝이 아니라 시작이에요 — 세 단계 모두 같이합니다</p>
+              </div>
+            </div>
+            <ol className="journey-steps">
+              <li>
+                <span className="journey-step-no">1</span>
+                <b>비교</b>
+                <span>여러 금융사 견적을 실시간으로 모아서 보여드려요. 혼자 알아보지 않아도 돼요.</span>
+              </li>
+              <li>
+                <span className="journey-step-no">2</span>
+                <b>계약</b>
+                <span>조건이 정해지면 서류 준비부터 인도까지, 헷갈리는 부분을 같이 짚어드려요.</span>
+              </li>
+              <li>
+                <span className="journey-step-no">3</span>
+                <b>동행</b>
+                <span>계약이 끝난 뒤에도 만기·재계약 시점에 서동이 먼저 연락드려요.</span>
+              </li>
+            </ol>
+          </div>
+        </section>
+
         {(instantDeliveryCards.length > 0 || popularCards.length > 0) && (
           <section className="landing-section">
             <div className="landing-inner">

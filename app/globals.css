@@ -1041,6 +1041,45 @@ input:focus, select:focus { outline: 2px solid var(--navy); outline-offset: 1px;
 .landing-section-alt { background: var(--panel-2); }
 .landing-sec-head { margin-bottom: 20px; }
 .landing-sec-head h2 { font-size: 19px; font-weight: 800; margin: 0; color: var(--navy-ink); }
+
+/* 서동 전용 — "동행 여정" 3단계. 비교/계약/동행이 실제 순서를 나타내므로
+   번호 마커가 장식이 아니라 정보다. */
+.landing-journey { background: var(--panel-2); }
+.journey-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.journey-steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 18px 16px;
+  position: relative;
+}
+.journey-step-no {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 800;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.journey-steps b { font-size: 15px; color: var(--navy-ink); }
+.journey-steps span:not(.journey-step-no) { font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; }
+@media (max-width: 640px) {
+  .journey-steps { grid-template-columns: 1fr; }
+}
 .landing-sec-desc { font-size: 13px; color: var(--ink-soft); margin: 4px 0 0; }
 
 .landing-row-block + .landing-row-block { margin-top: 30px; }
