@@ -247,6 +247,43 @@ function LogoMark({ size = 26 }: { size?: number }) {
   );
 }
 
+/**
+ * 히어로 장식 일러스트 — 실제 사진이 없어서(대표님 제공 자료 없음)
+ * 라인아트로 대체. "동행"을 문자 그대로 그렸다 — 차 옆에 손잡은 두
+ * 사람. 사진처럼 보이도록 꾸미지 않고 일러스트라는 걸 그대로 드러낸다.
+ */
+function FamilyIllustration({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 320 220"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+    >
+      <circle cx="266" cy="46" r="22" className="illust-sun" />
+      <path d="M20 178h280" stroke="currentColor" strokeWidth="3" strokeLinecap="round" opacity="0.35" />
+      <path
+        d="M40 178v-24c0-7 6-13 13-13h58c7 0 13 6 13 13v24"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <path d="M40 158h84" stroke="currentColor" strokeWidth="4" />
+      <circle cx="58" cy="178" r="10" fill="var(--panel)" stroke="currentColor" strokeWidth="4" />
+      <circle cx="106" cy="178" r="10" fill="var(--panel)" stroke="currentColor" strokeWidth="4" />
+      <path d="M56 145h30l10 13H50z" className="illust-accent" />
+      <g strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="176" cy="120" r="12" stroke="currentColor" strokeWidth="4" fill="var(--panel)" />
+        <path d="M176 132v34M176 146h-20M176 146h20M176 166l-12 12M176 166l12 12" stroke="currentColor" strokeWidth="4" fill="none" />
+        <circle cx="212" cy="132" r="9" className="illust-accent-stroke" strokeWidth="4" fill="var(--panel)" />
+        <path d="M212 141v26M212 152h-15M212 152h15M212 167l-9 9M212 167l9 9" className="illust-accent-stroke" strokeWidth="4" fill="none" />
+      </g>
+      <path d="M188 148l14 -8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function Wordmark() {
   return (
     <p className="brand">
@@ -1092,71 +1129,39 @@ export default function QuoteApp() {
         </header>
 
         <section className="landing-hero landing-hero-compact">
-          <div className="landing-inner">
-            <div className="landing-hero-row">
-              <h1>
-                차량의 처음부터 끝까지, <em>서동이 함께합니다</em>
-              </h1>
-              <a
-                className="landing-hero-kakao"
-                href={KAKAO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                💬 오픈카톡 상담
-              </a>
-            </div>
-            <p className="landing-hero-sub">
-              장기렌트·리스·법인 리스까지, 여러 금융사 견적을 실시간으로 비교해 최저가를 확인합니다. 계약 이후, 진짜 서동의 역할이 시작됩니다
-            </p>
-            <div className="landing-hero-badges">
-              <span>취급 차량 {index.length.toLocaleString("ko-KR")}+</span>
-              <span>취급 브랜드 {brands.length}개</span>
-              <span>제휴 금융사 3곳</span>
-            </div>
-            <form
-              className="landing-search"
-              onSubmit={(e) => {
-                e.preventDefault();
-                goToSearch(query);
-              }}
-            >
-              <input
-                type="text"
-                placeholder="차량명으로 검색 (예: 그랜저, E 300, Model Y)"
-                value={query}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="차량 검색"
-              />
-              <button type="submit">검색</button>
-            </form>
-            <div className="brand-chips landing-hero-chips">
-              {brands.slice(0, 8).map((b) => (
-                <button
-                  key={b}
-                  type="button"
-                  className="brand-chip"
-                  onClick={() => {
-                    setSearchBrand(b);
-                    navigate("home");
-                  }}
+          <div className="landing-inner landing-hero-split">
+            <div className="landing-hero-text">
+              <div className="landing-hero-row">
+                <h1>
+                  차량의 처음부터 끝까지, <em>서동이 함께합니다</em>
+                </h1>
+                <a
+                  className="landing-hero-kakao"
+                  href={KAKAO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  {b}
-                </button>
-              ))}
-              <button
-                type="button"
-                className="brand-chip"
-                onClick={() => navigate("home")}
-              >
-                +{Math.max(brands.length - 8, 0)}개 브랜드
+                  💬 오픈카톡 상담
+                </a>
+              </div>
+              <p className="landing-hero-sub">
+                장기렌트·리스·법인 리스까지, 여러 금융사 견적을 실시간으로 비교해 최저가를 확인합니다. 계약 이후, 진짜 서동의 역할이 시작됩니다
+              </p>
+              <div className="landing-hero-badges">
+                <span>취급 차량 {index.length.toLocaleString("ko-KR")}+</span>
+                <span>취급 브랜드 {brands.length}개</span>
+                <span>제휴 금융사 3곳</span>
+              </div>
+              <ol className="landing-howto">
+                <li><b>1</b>비교 — 여러 금융사 견적을 한눈에</li>
+                <li><b>2</b>계약 — 조건 확정까지 같이 확인</li>
+                <li><b>3</b>동행 — 계약 이후에도 서동이 먼저 연락</li>
+              </ol>
+              <button type="button" className="landing-nav-cta" onClick={() => navigate("home")}>
+                내 차 견적 만들기
               </button>
             </div>
-            <ol className="landing-howto">
-              <li><b>1</b>검색 — 차명으로 바로 찾기</li>
-              <li><b>2</b>비교 — 여러 금융사 견적을 한눈에</li>
-              <li><b>3</b>상담 — 오픈카톡으로 조건 확정</li>
-            </ol>
+            <FamilyIllustration className="landing-hero-illust" />
           </div>
         </section>
 
@@ -1306,35 +1311,6 @@ export default function QuoteApp() {
           </section>
         )}
 
-        <section className="landing-contact landing-contact-compact">
-          <div className="landing-inner landing-contact-bar">
-            <div className="landing-contact-bar-text">
-              <p className="landing-contact-bar-title">
-                차량명으로 바로 찾거나, 확신이 서면 오픈카톡으로 상담하세요
-              </p>
-              <p className="landing-contact-bar-meta">
-                {COMPANY_NAME} · {COMPANY_LEGAL} ·{" "}
-                <a href={BLOG_URL} target="_blank" rel="noopener noreferrer">
-                  블로그
-                </a>
-              </p>
-            </div>
-            <div className="landing-contact-bar-btns">
-              <button type="button" className="landing-nav-cta" onClick={() => navigate("home")}>
-                내 차 견적 만들기
-              </button>
-              <a
-                className="landing-kakao-btn"
-                href={KAKAO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                💬 오픈카톡 상담
-              </a>
-            </div>
-          </div>
-        </section>
-
         <section className="landing-section landing-features landing-features-compact">
           <div className="landing-inner">
             <p className="landing-mini-label">왜 서동인가 · 비교로 끝나지 않는 유일한 파트너</p>
@@ -1407,6 +1383,78 @@ export default function QuoteApp() {
                   서동이 먼저 연락드려요.
                 </p>
               </details>
+            </div>
+          </div>
+        </section>
+
+        <section className="landing-section landing-search-secondary">
+          <div className="landing-inner">
+            <p className="landing-row-label">
+              <span className="landing-tag">차량 검색</span>
+              찾는 차가 위에 없나요? 차량명으로 바로 검색하세요
+            </p>
+            <form
+              className="landing-search"
+              onSubmit={(e) => {
+                e.preventDefault();
+                goToSearch(query);
+              }}
+            >
+              <input
+                type="text"
+                placeholder="차량명으로 검색 (예: 그랜저, E 300, Model Y)"
+                value={query}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="차량 검색"
+              />
+              <button type="submit">검색</button>
+            </form>
+            <div className="brand-chips landing-hero-chips">
+              {brands.slice(0, 8).map((b) => (
+                <button
+                  key={b}
+                  type="button"
+                  className="brand-chip"
+                  onClick={() => {
+                    setSearchBrand(b);
+                    navigate("home");
+                  }}
+                >
+                  {b}
+                </button>
+              ))}
+              <button type="button" className="brand-chip" onClick={() => navigate("home")}>
+                +{Math.max(brands.length - 8, 0)}개 브랜드
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section className="landing-contact landing-contact-compact">
+          <div className="landing-inner landing-contact-bar">
+            <div className="landing-contact-bar-text">
+              <p className="landing-contact-bar-title">
+                차량명으로 바로 찾거나, 확신이 서면 오픈카톡으로 상담하세요
+              </p>
+              <p className="landing-contact-bar-meta">
+                {COMPANY_NAME} · {COMPANY_LEGAL} ·{" "}
+                <a href={BLOG_URL} target="_blank" rel="noopener noreferrer">
+                  블로그
+                </a>
+              </p>
+            </div>
+            <div className="landing-contact-bar-btns">
+              <button type="button" className="landing-nav-cta" onClick={() => navigate("home")}>
+                내 차 견적 만들기
+              </button>
+              <a
+                className="landing-kakao-btn"
+                href={KAKAO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                💬 오픈카톡 상담
+              </a>
             </div>
           </div>
         </section>
