@@ -1042,6 +1042,66 @@ input:focus, select:focus { outline: 2px solid var(--navy); outline-offset: 1px;
 }
 .landing-kakao-btn:hover { filter: brightness(0.97); }
 
+/* 서동 전용 — 히어로 3-도어 진입. 고객이 어느 단계에 있든 첫 화면에서
+   바로 자기 자리를 고를 수 있게(검색 / 예산 / 상담). */
+.door-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 22px; }
+.door-card {
+  display: flex; flex-direction: column; gap: 4px; text-align: left; cursor: pointer;
+  background: var(--panel); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 18px 18px 16px; text-decoration: none; font: inherit;
+  transition: border-color 0.12s, transform 0.12s;
+}
+.door-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.door-title { font-size: 15px; font-weight: 800; color: var(--navy-ink); }
+.door-desc { font-size: 12.5px; color: var(--ink-soft); }
+.door-go { font-size: 12px; font-weight: 700; color: var(--accent); margin-top: 8px; }
+.door-card-kakao { background: #FEE500; border-color: #F2D900; }
+.door-card-kakao .door-title { color: #191600; }
+.door-card-kakao .door-desc { color: #4a3f00; }
+.door-card-kakao .door-go { color: #191600; }
+@media (max-width: 720px) {
+  .door-grid { grid-template-columns: 1fr; }
+}
+
+/* 서동 전용 — "이런 차 찾으세요?" 목적별 1대씩 큰 카드 3장. 카드를
+   16장 깔던 걸 3장으로 줄여 한눈에 들어오게 한다. */
+.purpose-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.purpose-card {
+  display: flex; flex-direction: column; gap: 5px; text-align: left; cursor: pointer;
+  background: var(--panel); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 18px; font: inherit; transition: border-color 0.12s, transform 0.12s;
+}
+.purpose-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.purpose-label { font-size: 15px; font-weight: 800; color: var(--navy-ink); }
+.purpose-desc { font-size: 12px; color: var(--ink-faint); margin-bottom: 6px; }
+.purpose-card .veh-photo-stage { margin: 4px 0 8px; }
+.purpose-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+.purpose-cond { font-size: 11.5px; color: var(--ink-soft); }
+.purpose-price { font-size: 13px; color: var(--ink-soft); margin-top: 4px; }
+.purpose-price b { font-size: 19px; color: var(--navy-ink); font-variant-numeric: tabular-nums; }
+@media (max-width: 860px) {
+  .purpose-grid { grid-template-columns: 1fr; }
+}
+
+/* 서동 전용 — 카톡 상담 예시. 금액은 실제 계산값이 들어간다. */
+.landing-chat { background: var(--panel-2); }
+.chat-thread { display: flex; flex-direction: column; gap: 10px; max-width: 560px; }
+.chat-row { display: flex; align-items: flex-end; gap: 8px; }
+.chat-them { justify-content: flex-start; }
+.chat-us { justify-content: flex-end; }
+.chat-bubble {
+  max-width: 78%; font-size: 13px; line-height: 1.55; padding: 11px 14px; border-radius: 14px;
+}
+.chat-them .chat-bubble { background: var(--panel); border: 1px solid var(--rule); color: var(--ink); border-bottom-left-radius: 4px; }
+.chat-us .chat-bubble { background: #FEE500; color: #191600; border-bottom-right-radius: 4px; }
+.chat-who { font-size: 10.5px; font-weight: 700; color: var(--ink-faint); padding-bottom: 3px; }
+.chat-cta { margin-top: 18px; max-width: 220px; }
+
+.landing-stats-inline { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--rule); grid-template-columns: repeat(3, 1fr); }
+.landing-stats-inline .landing-stat-num { font-size: 18px; }
+.landing-stats-inline .landing-stat-num span { font-size: 12px; }
+.landing-stats-inline .landing-stat-label { font-size: 10.5px; }
+
 .landing-stats { background: var(--panel-2); padding: 24px 20px; border-bottom: 1px solid var(--rule); }
 .landing-stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
 .landing-stat-item { text-align: center; }

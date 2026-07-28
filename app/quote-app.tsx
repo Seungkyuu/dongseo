@@ -100,13 +100,10 @@ const BLOG_URL = "https://blog.naver.com/leenkim_lease_";
 const COMPANY_NAME = "주식회사 서동";
 const COMPANY_LEGAL = "이준성 대표 · 서울특별시 강서구 마곡중앙6로 10, 203-23호 · 사업자등록번호 309-86-04116";
 
-const TRUST_STATS: { num: string; unit: string; label: string }[] = [
-  { num: "10", unit: "년+", label: "업력" },
-  { num: "3,400", unit: "+", label: "누적 계약" },
-  { num: "98", unit: "%", label: "고객 만족도" },
-  { num: "10", unit: "+", label: "제휴 금융사" },
-];
-
+/** 신뢰 지표는 실제로 검증 가능한 값만 쓴다 — 서동은 2026년 4월 개업이라
+ *  "업력 10년+"·"누적 계약 3,400건"·"만족도 98%" 같은 수치를 쓸 수 없다
+ *  (RENTO에서 복사돼 왔던 값이라 전부 제거). 취급 차량/브랜드 수는 실제
+ *  인덱스에서 그 자리에서 세고, 제휴 금융사 3곳도 실제 연동된 수다. */
 const RENTO_FEATURES: { title: string; desc: string }[] = [
   {
     title: "실시간 최저가 비교",
@@ -1014,28 +1011,50 @@ export default function QuoteApp() {
       return { ...item, monthlyPayment, residualRate, image: group?.image };
     }).filter((c): c is NonNullable<typeof c> => !!c);
   }, [groups]);
-  const familyCards = useMemo(() => rankPool(FAMILY_POOL), [groups]);
-  const businessCards = useMemo(() => rankPool(BUSINESS_LEASE_POOL), [groups]);
-  const hybridCards = useMemo(() => {
-    const seen = new Set<string>();
-    const cards: {
-      vehicle: IndexedVehicle;
-      deal: DealType;
-      monthlyPayment: number;
-      residualRate?: number;
-      spread: number;
-      sourceCount: number;
-    }[] = [];
-    for (const v of index) {
-      if (seen.has(v.modelGroup)) continue;
-      if (!v.refs.some((r) => HYBRID_LABEL_RE.test(r.model))) continue;
-      const q = bestLandingQuote(v);
-      if (!q) continue;
-      seen.add(v.modelGroup);
-      cards.push({ vehicle: v, ...q });
+  /** "이런 차 찾으세요?" — 목적 3가지에 각각 1대씩만. 카드를 16장 깔던
+   *  걸 3장으로 줄여 한눈에 들어오게 한다(가격은 전부 실시간 계산값). */
+  const purposePicks = useMemo(() => {
+    const hybridBest = (() => {
+      const seen = new Set<string>();
+      const cards: { vehicle: IndexedVehicle; deal: DealType; monthlyPayment: number; spread: number; sourceCount: number }[] = [];
+      for (const v of index) {
+        if (seen.has(v.modelGroup)) continue;
+        if (!v.refs.some((r) => HYBRID_LABEL_RE.test(r.model))) continue;
+        const q = bestLandingQuote(v);
+        if (!q) continue;
+        seen.add(v.modelGroup);
+        cards.push({ vehicle: v, ...q });
+      }
+      return cards.sort((a, b) => a.monthlyPayment - b.monthlyPayment)[0] ?? null;
+    })();
+    return [
+      { label: "가족과 함께", desc: "넉넉한 실내, 장거리도 편하게", pick: rankPool(FAMILY_POOL, 1)[0] ?? null },
+      { label: "출퇴근용", desc: "매일 타는 차, 유지비가 관건", pick: hybridBest },
+      { label: "법인 명의로", desc: "비용 처리까지 생각한다면", pick: rankPool(BUSINESS_LEASE_POOL, 1)[0] ?? null },
+    ].filter((p): p is typeof p & { pick: NonNullable<typeof p.pick> } => !!p.pick);
+  }, [groups, index]);
+
+  /** 카톡 상담 예시에 넣을 실제 숫자 — 그랜저를 보증금 30%/0%로 각각
+   *  계산해서 "말풍선 속 금액"까지 진짜 값으로 채운다(가짜 대화 방지). */
+  const chatExample = useMemo(() => {
+    const g = groups.find((g) => g.brand === "현대" && g.name === "그랜저");
+    const v = g?.trims[0];
+    if (!v) return null;
+    function quoteAt(depositRate: number): number | null {
+      for (const deal of PROMO_DEAL_TRY_ORDER) {
+        if (!dealsForIndexed(v!).includes(deal)) continue;
+        const ok = quoteIndexed(v!, deal, { ...PROMO_CONDITIONS, depositRate }).filter(
+          (r) => r.available && typeof r.monthlyPayment === "number",
+        );
+        if (ok.length > 0) return Math.min(...ok.map((r) => r.monthlyPayment!));
+      }
+      return null;
     }
-    return cards.sort((a, b) => a.monthlyPayment - b.monthlyPayment).slice(0, 3);
-  }, [index]);
+    const withDeposit = quoteAt(0.3);
+    const noDeposit = quoteAt(0);
+    if (withDeposit === null || noDeposit === null) return null;
+    return { name: v.display, withDeposit, noDeposit };
+  }, [groups]);
 
   function goToSearch(q?: string) {
     if (q !== undefined) setSearchQuery(q);
@@ -1131,37 +1150,47 @@ export default function QuoteApp() {
         <section className="landing-hero landing-hero-compact">
           <div className="landing-inner landing-hero-split">
             <div className="landing-hero-text">
-              <div className="landing-hero-row">
-                <h1>
-                  차량의 처음부터 끝까지, <em>서동이 함께합니다</em>
-                </h1>
-                <a
-                  className="landing-hero-kakao"
-                  href={KAKAO_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  💬 오픈카톡 상담
-                </a>
-              </div>
+              <h1>
+                차, <em>혼자 알아보지 마세요</em>
+              </h1>
               <p className="landing-hero-sub">
-                장기렌트·리스·법인 리스까지, 여러 금융사 견적을 실시간으로 비교해 최저가를 확인합니다. 계약 이후, 진짜 서동의 역할이 시작됩니다
+                장기렌트·리스·법인 리스, 서동이 같이 비교해드립니다
               </p>
               <div className="landing-hero-badges">
                 <span>취급 차량 {index.length.toLocaleString("ko-KR")}+</span>
                 <span>취급 브랜드 {brands.length}개</span>
                 <span>제휴 금융사 3곳</span>
               </div>
-              <ol className="landing-howto">
-                <li><b>1</b>비교 — 여러 금융사 견적을 한눈에</li>
-                <li><b>2</b>계약 — 조건 확정까지 같이 확인</li>
-                <li><b>3</b>동행 — 계약 이후에도 서동이 먼저 연락</li>
-              </ol>
-              <button type="button" className="landing-nav-cta" onClick={() => navigate("home")}>
-                내 차 견적 만들기
-              </button>
             </div>
             <JourneyIllustration className="landing-hero-illust" />
+          </div>
+
+          {/* 히어로가 곧 진입점 — 글자만 있는 히어로 대신 세 갈래 문을 둔다.
+              고객이 어느 단계에 있든(차를 정했든/예산만 있든/아무것도 모르든)
+              첫 화면에서 바로 자기 자리를 고를 수 있게. */}
+          <div className="landing-inner">
+            <div className="door-grid">
+              <button type="button" className="door-card" onClick={() => navigate("home")}>
+                <span className="door-title">차는 정했어요</span>
+                <span className="door-desc">차명으로 바로 검색</span>
+                <span className="door-go">검색하기 →</span>
+              </button>
+              <button type="button" className="door-card" onClick={() => navigate("budget")}>
+                <span className="door-title">예산부터 볼게요</span>
+                <span className="door-desc">월 예산으로 찾기</span>
+                <span className="door-go">예산 입력 →</span>
+              </button>
+              <a
+                className="door-card door-card-kakao"
+                href={KAKAO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="door-title">잘 모르겠어요</span>
+                <span className="door-desc">카톡으로 물어보기</span>
+                <span className="door-go">💬 상담하기 →</span>
+              </a>
+            </div>
           </div>
         </section>
 
@@ -1205,108 +1234,82 @@ export default function QuoteApp() {
           </div>
         </section>
 
-        {(instantDeliveryCards.length > 0 ||
-          familyCards.length > 0 ||
-          businessCards.length > 0 ||
-          hybridCards.length > 0) && (
+        {purposePicks.length > 0 && (
           <section className="landing-section">
             <div className="landing-inner">
               <div className="landing-sec-head">
                 <div>
-                  <h2>목적별 추천 차량</h2>
+                  <h2>이런 차 찾으세요?</h2>
                   <p className="landing-sec-desc">
                     48개월 · 보증금 30% 기준 실시간 계산가 · 클릭하면 트림 선택 → 최저가 비교로 이동
                   </p>
                 </div>
               </div>
+              <div className="purpose-grid">
+                {purposePicks.map(({ label, desc, pick }) => (
+                  <button
+                    key={label}
+                    type="button"
+                    className="purpose-card"
+                    onClick={() => pickVehicle(pick.vehicle)}
+                  >
+                    <span className="purpose-label">{label}</span>
+                    <span className="purpose-desc">{desc}</span>
+                    <VehiclePhoto brand={pick.vehicle.brand} src={pick.vehicle.image} />
+                    <span className="purpose-name">{pick.vehicle.display}</span>
+                    <span className="purpose-cond">
+                      {DEAL_EXPLAIN[pick.deal].name} · 48개월
+                      {pick.sourceCount > 1 ? ` · ${pick.sourceCount}사 비교` : ""}
+                    </span>
+                    <span className="purpose-price">
+                      월 <b>{won(pick.monthlyPayment)}</b>원부터
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
-              {instantDeliveryCards.length > 0 && (
-                <div className="landing-row-block">
-                  <p className="landing-row-label">
-                    <span className="landing-tag landing-tag-promo">즉시출고 가능 차량</span>
-                    이미 확보된 재고, 색상·옵션 변경 없이 바로 인도
+        {chatExample && (
+          <section className="landing-section landing-chat">
+            <div className="landing-inner">
+              <div className="landing-sec-head">
+                <div>
+                  <h2>이렇게 물어보시면 됩니다</h2>
+                  <p className="landing-sec-desc">
+                    복잡한 양식 없이 카톡으로 편하게 — 아래 금액은 지금 실제로 계산된 값이에요
                   </p>
-                  <div className="landing-promo-grid">
-                    {instantDeliveryCards.map((item) => (
-                      <button
-                        key={`${item.model}-${item.color}-${item.interior}`}
-                        type="button"
-                        className="landing-promo-card"
-                        onClick={() => goToSearch(item.group)}
-                      >
-                        <span className="landing-promo-badge">즉시출고 가능</span>
-                        <VehiclePhoto brand="테슬라" src={item.image} />
-                        <span className="landing-promo-body">
-                          <span className="landing-promo-brand">테슬라</span>
-                          <span className="landing-promo-name">
-                            Model {item.group === "모델 Y" ? "Y" : "3"} {item.trimLabel}
-                          </span>
-                          <span className="landing-promo-row">
-                            <span>차량가</span>
-                            <span>{man(item.vehiclePrice)}</span>
-                          </span>
-                          <span className="landing-promo-cond">
-                            {item.color} · {item.wheel}
-                          </span>
-                          <span className="landing-promo-cond">
-                            운용리스 · 잔가 {Math.round(item.residualRate * 100)}% 반영
-                          </span>
-                          <span className="landing-promo-price-lbl">월 리스료</span>
-                          <span className="landing-promo-price">
-                            {won(item.monthlyPayment)}
-                            <small>원부터</small>
-                          </span>
-                          <span className="landing-promo-spread landing-spread-muted">
-                            고정 사양 재고 · 색상·옵션 변경 불가 · 소진 시 마감
-                          </span>
-                        </span>
-                      </button>
-                    ))}
-                  </div>
                 </div>
-              )}
-
-              {(
-                [
-                  ["패밀리카 TOP3", "가족·장거리 동승에 어울리는 SUV·대형 세단", familyCards],
-                  ["비즈니스 리스 TOP3", "법인 차량으로 많이 찾는 프리미엄 세단 · 운용·금융리스", businessCards],
-                  ["출퇴근 Hybrid TOP3", "실제 하이브리드·HEV 트림만 걸러낸 순위", hybridCards],
-                ] as const
-              ).map(([label, desc, items]) =>
-                items.length > 0 ? (
-                  <div className="landing-row-block" key={label}>
-                    <p className="landing-row-label">
-                      <span className="landing-tag">{label}</span>
-                      {desc}
-                    </p>
-                    <div className="landing-model-grid">
-                      {items.map(({ vehicle: v, deal, monthlyPayment, spread, sourceCount }, i) => (
-                        <button
-                          key={`${label}-${v.id}`}
-                          type="button"
-                          className="landing-model-card"
-                          onClick={() => pickVehicle(v)}
-                        >
-                          <span className="landing-model-badge">
-                            {i + 1}위 · {sourceCount > 1 ? `${sourceCount}사 비교` : "단독 취급"}
-                          </span>
-                          <VehiclePhoto brand={v.brand} src={v.image} />
-                          <span className="landing-model-name">{v.display}</span>
-                          <span className="landing-model-cond">{DEAL_EXPLAIN[deal].name} · 48개월</span>
-                          <span className="landing-model-price">
-                            월 <b>{won(monthlyPayment)}</b>원부터
-                          </span>
-                          {spread > 0 ? (
-                            <span className="landing-model-spread">최대 {won(spread)}원 차이</span>
-                          ) : (
-                            <span className="landing-model-spread landing-spread-muted">비교 대상 없음</span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : null,
-              )}
+              </div>
+              <div className="chat-thread">
+                <div className="chat-row chat-them">
+                  <span className="chat-bubble">{chatExample.name} 리스로 하면 얼마예요?</span>
+                </div>
+                <div className="chat-row chat-us">
+                  <span className="chat-who">서동</span>
+                  <span className="chat-bubble">
+                    48개월·연 2만km 기준으로 비교해봤어요. 최저 월 {won(chatExample.withDeposit)}원입니다
+                  </span>
+                </div>
+                <div className="chat-row chat-them">
+                  <span className="chat-bubble">보증금 낮추면요?</span>
+                </div>
+                <div className="chat-row chat-us">
+                  <span className="chat-who">서동</span>
+                  <span className="chat-bubble">
+                    보증금 0%면 월 {won(chatExample.noDeposit)}원이에요. 어느 쪽이 편하세요?
+                  </span>
+                </div>
+              </div>
+              <a
+                className="landing-kakao-btn chat-cta"
+                href={KAKAO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                💬 이렇게 물어보기
+              </a>
             </div>
           </section>
         )}
@@ -1322,24 +1325,21 @@ export default function QuoteApp() {
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-
-        <section className="landing-stats landing-stats-compact">
-          <div className="landing-inner landing-stats-grid">
-            {[
-              ...TRUST_STATS,
-              { num: index.length.toLocaleString("ko-KR"), unit: "+", label: "취급 차량" },
-              { num: String(brands.length), unit: "개", label: "취급 브랜드" },
-            ].map((s) => (
-              <div key={s.label} className="landing-stat-item">
-                <div className="landing-stat-num">
-                  {s.num}
-                  <span>{s.unit}</span>
+            <div className="landing-stats-grid landing-stats-inline">
+              {[
+                { num: index.length.toLocaleString("ko-KR"), unit: "+", label: "취급 차량" },
+                { num: String(brands.length), unit: "개", label: "취급 브랜드" },
+                { num: "3", unit: "곳", label: "제휴 금융사" },
+              ].map((s) => (
+                <div key={s.label} className="landing-stat-item">
+                  <div className="landing-stat-num">
+                    {s.num}
+                    <span>{s.unit}</span>
+                  </div>
+                  <div className="landing-stat-label">{s.label}</div>
                 </div>
-                <div className="landing-stat-label">{s.label}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
@@ -1356,10 +1356,17 @@ export default function QuoteApp() {
                 <p>아니요, 견적 비교와 상담 모두 무료예요. 계약 시에도 별도 수수료를 서동에 내지 않아요.</p>
               </details>
               <details>
-                <summary>최저가는 어떻게 찾나요?</summary>
+                <summary>차를 아직 안 정했는데 상담해도 되나요?</summary>
                 <p>
-                  차량을 고르면 제휴 금융사 견적을 실시간으로 계산해서 비교해요. 어제 시세가 아니라
-                  항상 최신 조건 기준이고, 잔존가치·초기 비용까지 계산 근거를 그대로 보여드려요.
+                  그럼요, 오히려 그때 상담하시는 게 좋아요. 예산·인원수·주행거리만 알려주시면
+                  어떤 차가 맞을지부터 같이 좁혀드려요. 차종을 정하고 오셔야 하는 건 아니에요.
+                </p>
+              </details>
+              <details>
+                <summary>법인 명의로도 되나요?</summary>
+                <p>
+                  네, 법인 리스·장기렌트 모두 취급해요. 개인 명의와 조건이 달라지는 부분이 있어서
+                  상담 시 어느 쪽이 유리한지 같이 비교해드려요.
                 </p>
               </details>
               <details>
@@ -1377,10 +1384,10 @@ export default function QuoteApp() {
                 </p>
               </details>
               <details>
-                <summary>계약 이후에도 도와주나요?</summary>
+                <summary>계약 이후에도 연락이 되나요?</summary>
                 <p>
-                  네, 서동의 정체성이 바로 그 부분이에요. 계약이 끝난 뒤에도 만기·재계약 시점에
-                  서동이 먼저 연락드려요.
+                  네, 서동의 정체성이 바로 그 부분이에요. 계약 기간 중 궁금한 건 언제든 오픈카톡으로
+                  물어보시면 되고, 만기·재계약 시점엔 서동이 먼저 연락드려요.
                 </p>
               </details>
             </div>
