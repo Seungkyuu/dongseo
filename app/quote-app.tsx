@@ -248,38 +248,38 @@ function LogoMark({ size = 26 }: { size?: number }) {
 }
 
 /**
- * 히어로 장식 일러스트 — 실제 사진이 없어서(대표님 제공 자료 없음)
- * 라인아트로 대체. "동행"을 문자 그대로 그렸다 — 차 옆에 손잡은 두
- * 사람. 사진처럼 보이도록 꾸미지 않고 일러스트라는 걸 그대로 드러낸다.
+ * 히어로 장식 일러스트 — 사람 형상은 단순 선화로 그리면 어설퍼 보여서
+ * (1차 시도에서 확인됨) 대신 로고 마크의 "두 갈래 길이 만나 함께
+ * 내려간다"는 모티프를 크게 확장한 여정(길) 추상화로 바꿨다. 웨이포인트
+ * 3개는 "비교·계약·동행" 3단계를 은유한다 — 장식이 아니라 실제 순서.
  */
-function FamilyIllustration({ className }: { className?: string }) {
+function JourneyIllustration({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 320 220"
+      viewBox="0 0 320 200"
       fill="none"
       aria-hidden="true"
       className={className}
     >
-      <circle cx="266" cy="46" r="22" className="illust-sun" />
-      <path d="M20 178h280" stroke="currentColor" strokeWidth="3" strokeLinecap="round" opacity="0.35" />
       <path
-        d="M40 178v-24c0-7 6-13 13-13h58c7 0 13 6 13 13v24"
+        d="M20,150 C70,150 90,120 130,105 C170,90 190,60 190,30"
         stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.28"
+      />
+      <path
+        d="M20,150 C70,150 90,120 130,105"
+        className="illust-accent-stroke"
         strokeWidth="4"
-        strokeLinejoin="round"
+        strokeLinecap="round"
         fill="none"
       />
-      <path d="M40 158h84" stroke="currentColor" strokeWidth="4" />
-      <circle cx="58" cy="178" r="10" fill="var(--panel)" stroke="currentColor" strokeWidth="4" />
-      <circle cx="106" cy="178" r="10" fill="var(--panel)" stroke="currentColor" strokeWidth="4" />
-      <path d="M56 145h30l10 13H50z" className="illust-accent" />
-      <g strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="176" cy="120" r="12" stroke="currentColor" strokeWidth="4" fill="var(--panel)" />
-        <path d="M176 132v34M176 146h-20M176 146h20M176 166l-12 12M176 166l12 12" stroke="currentColor" strokeWidth="4" fill="none" />
-        <circle cx="212" cy="132" r="9" className="illust-accent-stroke" strokeWidth="4" fill="var(--panel)" />
-        <path d="M212 141v26M212 152h-15M212 152h15M212 167l-9 9M212 167l9 9" className="illust-accent-stroke" strokeWidth="4" fill="none" />
-      </g>
-      <path d="M188 148l14 -8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      <circle cx="20" cy="150" r="6" fill="var(--panel)" stroke="currentColor" strokeWidth="3" />
+      <circle cx="130" cy="105" r="6" fill="var(--panel)" stroke="currentColor" strokeWidth="3" />
+      <circle cx="190" cy="30" r="7" className="illust-accent" />
+      <circle cx="250" cy="52" r="30" className="illust-sun" />
     </svg>
   );
 }
@@ -1161,7 +1161,7 @@ export default function QuoteApp() {
                 내 차 견적 만들기
               </button>
             </div>
-            <FamilyIllustration className="landing-hero-illust" />
+            <JourneyIllustration className="landing-hero-illust" />
           </div>
         </section>
 
