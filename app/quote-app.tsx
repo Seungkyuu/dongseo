@@ -104,23 +104,6 @@ const COMPANY_LEGAL = "이준성 대표 · 서울특별시 강서구 마곡중�
  *  "업력 10년+"·"누적 계약 3,400건"·"만족도 98%" 같은 수치를 쓸 수 없다
  *  (RENTO에서 복사돼 왔던 값이라 전부 제거). 취급 차량/브랜드 수는 실제
  *  인덱스에서 그 자리에서 세고, 제휴 금융사 3곳도 실제 연동된 수다. */
-/** 문구는 실제로 하는 것만 쓴다 — "유일한 파트너"(검증 불가한 최상급),
- *  "내일도 유효한 최신가"(보장 불가한 약속) 같은 표현은 제거. */
-const RENTO_FEATURES: { title: string; desc: string }[] = [
-  {
-    title: "혼자 알아보지 않아도 됩니다",
-    desc: "여러 금융사 견적을 한 번에 모아 비교해드려요. 어디에 물어봐야 할지부터 고민하지 않으셔도 돼요.",
-  },
-  {
-    title: "숨김 없는 계산 근거",
-    desc: "잔존가치·초기 비용·총 납부액까지 전부 펼쳐서 보여드려요. 눌러야 나오는 작은 글씨는 없어요.",
-  },
-  {
-    title: "계약 이후에도 이어집니다",
-    desc: "계약 기간 중 문의는 언제든, 만기·재계약 시점엔 서동이 먼저 연락드려요.",
-  },
-];
-
 const PROMO_CONDITIONS = { termMonths: 48, annualMileageKm: 20000, depositRate: 0.3, prepayment: 0 };
 const PROMO_DEAL_TRY_ORDER: DealType[] = ["operatingLease", "financeLease", "longTermRental"];
 
@@ -1334,18 +1317,12 @@ export default function QuoteApp() {
           </section>
         )}
 
+        {/* "왜 서동인가" 3가지 문구는 위쪽 "동행 3단계"와 같은 말을 반복해서
+            제거했다(같은 주장이 한 페이지에 두 번 나오면 둘 다 약해진다).
+            실제 수치 지표만 얇은 띠로 남긴다. */}
         <section className="landing-section landing-features landing-features-compact">
           <div className="landing-inner">
-            <p className="landing-mini-label">왜 서동인가 · 비교로 끝나지 않습니다</p>
-            <div className="landing-feature-list">
-              {RENTO_FEATURES.map((f) => (
-                <div key={f.title} className="landing-feature-item">
-                  <b>{f.title}</b>
-                  <span>{f.desc}</span>
-                </div>
-              ))}
-            </div>
-            <div className="landing-stats-grid landing-stats-inline">
+            <div className="landing-stats-grid landing-stats-inline landing-stats-solo">
               {[
                 { num: index.length.toLocaleString("ko-KR"), unit: "+", label: "취급 차량" },
                 { num: String(brands.length), unit: "개", label: "취급 브랜드" },
@@ -1464,10 +1441,7 @@ export default function QuoteApp() {
                 차량명으로 바로 찾거나, 확신이 서면 오픈카톡으로 상담하세요
               </p>
               <p className="landing-contact-bar-meta">
-                {COMPANY_NAME} · {COMPANY_LEGAL} ·{" "}
-                <a href={BLOG_URL} target="_blank" rel="noopener noreferrer">
-                  블로그
-                </a>
+                견적 비교도, 상담도 무료예요
               </p>
             </div>
             <div className="landing-contact-bar-btns">

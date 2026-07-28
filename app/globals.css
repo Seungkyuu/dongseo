@@ -1098,6 +1098,8 @@ input:focus, select:focus { outline: 2px solid var(--navy); outline-offset: 1px;
 .chat-cta { margin-top: 18px; max-width: 220px; }
 
 .landing-stats-inline { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--rule); grid-template-columns: repeat(3, 1fr); }
+/* 위에 아무것도 없이 지표만 단독으로 놓일 때는 구분선·여백이 필요 없다 */
+.landing-stats-solo { margin-top: 0; padding-top: 0; border-top: none; }
 .landing-stats-inline .landing-stat-num { font-size: 18px; }
 .landing-stats-inline .landing-stat-num span { font-size: 12px; }
 .landing-stats-inline .landing-stat-label { font-size: 10.5px; }
