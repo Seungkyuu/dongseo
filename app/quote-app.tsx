@@ -1182,7 +1182,10 @@ export default function QuoteApp() {
         <section className="landing-hero landing-hero-compact">
           <div className="landing-inner landing-hero-split">
             <div className="landing-hero-text">
-              <p className="landing-hero-eyebrow">차량 생애주기를 함께 걷는 동행자</p>
+              <div className="landing-hero-eyebrow-row">
+                <LogoMark size={30} />
+                <p className="landing-hero-eyebrow">차량 생애주기를 함께 걷는 동행자</p>
+              </div>
               <h1>
                 차, <em>혼자 고민하지 마세요</em>
               </h1>
@@ -1245,27 +1248,33 @@ export default function QuoteApp() {
                 <b>서로</b>의 상황에 맞는 상품을 찾고, 계약 이후에도 끝까지 <b>동행</b>합니다.
                 잔존가치·수수료 근거는 전 과정 <b>투명</b>하게 공개해요 — &quot;서동&quot;이라는 이름 그대로예요.
               </p>
-              <ol className="journey-steps journey-steps-flat">
+              <ol className="journey-steps-flat">
                 <li>
-                  <span className="journey-step-no">1</span>
-                  <b>비교</b>
-                  <span>
+                  <div className="journey-step-head">
+                    <span className="journey-step-no">1</span>
+                    <b>비교</b>
+                  </div>
+                  <p>
                     여러 캐피탈사 견적을 실시간으로 모아서 보여드려요. 잔존가치·초기비용·총납부액까지
                     계산 근거 전체 공개.
-                  </span>
+                  </p>
                 </li>
                 <li>
-                  <span className="journey-step-no">2</span>
-                  <b>계약</b>
-                  <span>조건이 정해지면 서류 준비부터 인도까지, 헷갈리는 부분을 같이 짚어드려요.</span>
+                  <div className="journey-step-head">
+                    <span className="journey-step-no">2</span>
+                    <b>계약</b>
+                  </div>
+                  <p>조건이 정해지면 서류 준비부터 인도까지, 헷갈리는 부분을 같이 짚어드려요.</p>
                 </li>
                 <li>
-                  <span className="journey-step-no">3</span>
-                  <b>동행</b>
-                  <span>
+                  <div className="journey-step-head">
+                    <span className="journey-step-no">3</span>
+                    <b>동행</b>
+                  </div>
+                  <p>
                     계약 기간 내내 곁에 있어요 — 고장·정비·사고 처리부터 재계약·추가 견적까지, 만기가
                     아니어도 언제든 연락 주세요. 만기 6개월 전에는 저희가 먼저 연락드려요.
-                  </span>
+                  </p>
                   <em className="journey-step-tag">계약 기간 내내 상시 지원</em>
                 </li>
               </ol>

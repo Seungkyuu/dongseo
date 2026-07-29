@@ -1007,10 +1007,15 @@ input:focus, select:focus { outline: 2px solid var(--navy); outline-offset: 1px;
   .landing-hero-illust { width: 140px; }
 }
 .landing-hero-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.landing-hero h1 { font-size: 24px; font-weight: 800; line-height: 1.35; margin: 0; color: var(--navy-ink); }
+.landing-hero h1 { font-size: 40px; font-weight: 800; line-height: 1.32; margin: 0; letter-spacing: -0.01em; color: var(--navy-ink); }
 .landing-hero h1 em { color: var(--accent); font-style: normal; }
-.landing-hero-eyebrow { font-size: 12.5px; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; margin: 0 0 10px; }
-.landing-hero-sub { font-size: 13.5px; color: var(--ink-soft); margin: 6px 0 16px; }
+.landing-hero-eyebrow-row { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; color: var(--navy); }
+.landing-hero-eyebrow { font-size: 15px; font-weight: 700; color: var(--accent); letter-spacing: 0.01em; margin: 0; }
+.landing-hero-sub { font-size: 16px; color: var(--ink-soft); margin: 14px 0 20px; line-height: 1.6; }
+@media (max-width: 720px) {
+  .landing-hero h1 { font-size: 27px; }
+  .landing-hero-sub { font-size: 14px; }
+}
 .landing-hero-kakao {
   flex-shrink: 0;
   background: #FEE500; color: #191600; font-weight: 700; font-size: 12.5px;
@@ -1209,18 +1214,27 @@ input:focus, select:focus { outline: 2px solid var(--navy); outline-offset: 1px;
 }
 
 /* 세로로 쌓는 플랫 버전 — 카드 없이 구분선만, 옆에 카톡 카드가 붙는
-   2단 레이아웃에서 쓴다(landing-journey-layout 참고). */
+   2단 레이아웃에서 쓴다(landing-journey-layout 참고). 번호 배지와
+   제목을 한 줄에 나란히 놓고, 설명은 그 아래 배지 폭만큼 들여써서
+   같은 세로선에 맞춘다(번호가 위에 혼자 떠 있던 이전 배치가 어색했음). */
 .journey-steps-flat {
   display: flex; flex-direction: column; gap: 0;
+  list-style: none; margin: 0; padding: 0;
 }
 .journey-steps-flat > li {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
-  padding: 18px 0; border-top: 1px solid var(--rule);
+  padding: 22px 0; border-top: 1px solid var(--rule);
 }
 .journey-steps-flat > li:first-child { border-top: none; padding-top: 0; }
+.journey-step-head { display: flex; align-items: center; gap: 12px; }
+.journey-step-head b { font-size: 17px; font-weight: 800; color: var(--navy-ink); }
+.journey-steps-flat > li > p {
+  margin: 8px 0 0; padding-left: 38px;
+  font-size: 13.5px; color: var(--ink-soft); line-height: 1.65;
+}
 .journey-step-tag {
-  display: inline-block; font-style: normal; font-size: 10.5px; font-weight: 700;
-  color: var(--accent); background: var(--accent-bg); border-radius: 5px; padding: 2px 8px; margin-top: 4px;
+  display: inline-block; font-style: normal; font-size: 11px; font-weight: 700;
+  color: var(--accent); background: var(--accent-bg); border-radius: 5px; padding: 3px 9px;
+  margin: 10px 0 0 38px;
 }
 
 .chat-card {
@@ -1259,8 +1273,8 @@ input:focus, select:focus { outline: 2px solid var(--navy); outline-offset: 1px;
 .landing-cta { background: var(--panel-2); border-bottom: 1px solid var(--rule); padding: 56px 0; }
 .landing-cta-split { display: flex; gap: 56px; align-items: center; }
 .landing-cta-text { flex: 1 1 400px; }
-.landing-cta-text h2 { font-size: 24px; font-weight: 800; line-height: 1.42; color: var(--navy-ink); margin: 0; }
-.landing-cta-text p { font-size: 13.5px; color: var(--ink-soft); margin: 12px 0 0; max-width: 400px; line-height: 1.6; }
+.landing-cta-text h2 { font-size: 32px; font-weight: 800; line-height: 1.4; color: var(--navy-ink); margin: 0; }
+.landing-cta-text p { font-size: 15px; color: var(--ink-soft); margin: 16px 0 0; max-width: 400px; line-height: 1.7; }
 @media (max-width: 860px) { .landing-cta-split { flex-direction: column; gap: 28px; } }
 
 .lead-form { flex: 1 1 380px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 22px; }
