@@ -95,6 +95,9 @@ const BUDGET_PRESETS = [500_000, 700_000, 1_000_000, 1_500_000];
 
 const KAKAO_URL = "https://open.kakao.com/o/s2R3r8Fi";
 const BLOG_URL = "https://blog.naver.com/leenkim_lease_";
+const CONTACT_PHONE = "010-5008-7722";
+const CONTACT_EMAIL = "seodong_car@gmail.com";
+const CONTACT_FAX = "0504-391-5100";
 
 /** 사업자등록증 원본 기준(등록번호 309-86-04116) */
 const COMPANY_NAME = "주식회사 서동";
@@ -1462,7 +1465,12 @@ export default function QuoteApp() {
 
         <footer className="landing-footer">
           <div className="landing-inner landing-footer-row">
-            <span>{COMPANY_NAME} · {COMPANY_LEGAL}</span>
+            <span>
+              {COMPANY_NAME} · {COMPANY_LEGAL}
+              <br />
+              <a href={`tel:${CONTACT_PHONE}`}>{CONTACT_PHONE}</a> ·{" "}
+              <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> · 팩스 {CONTACT_FAX}
+            </span>
             <span>
               <a href={KAKAO_URL} target="_blank" rel="noopener noreferrer">
                 오픈카톡
