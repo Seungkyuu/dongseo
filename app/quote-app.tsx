@@ -12,7 +12,7 @@
  *   · 엔진 내부 문구는 고객 언어로 번역해 노출한다.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { lowestCapital, type DealType, type CapitalQuoteRow } from "@/lib/engine/capitals";
 import { logoForBrand } from "@/lib/engine/brand-logo";
 import {
@@ -98,6 +98,10 @@ const BLOG_URL = "https://blog.naver.com/leenkim_lease_";
 const CONTACT_PHONE = "010-5008-7722";
 const CONTACT_EMAIL = "seodong_car@gmail.com";
 const CONTACT_FAX = "0504-391-5100";
+
+/** 겟챠 28개 브랜드 중 국내 완성차 6곳 — 나머지는 전부 수입(테슬라·BYD 포함,
+ *  둘 다 해외 브랜드라 국산이 아니다). 랜딩 "차량 검색" 탭 구분용. */
+const DOMESTIC_BRANDS = new Set(["현대", "기아", "제네시스", "르노코리아", "쉐보레", "KGM"]);
 
 /** 사업자등록증 원본 기준(등록번호 309-86-04116) */
 const COMPANY_NAME = "주식회사 서동";
@@ -874,6 +878,23 @@ export default function QuoteApp() {
   const [query, setQuery] = useState("");
   const [activeBrand, setActiveBrand] = useState<string | null>(null);
   const [activeGroup, setActiveGroup] = useState<ModelGroupSummary | null>(null);
+  const [originTab, setOriginTab] = useState<"domestic" | "import" | null>(null);
+  const [showAllBrands, setShowAllBrands] = useState(false);
+
+  // 랜딩 하단 리드폼 — 저장할 백엔드가 없어서 DB엔 안 남기고, 제출 시
+  // 입력값을 이메일 본문에 채워 서동 메일로 즉시 전달 + 오픈카톡도 같이 연다.
+  const [leadCar, setLeadCar] = useState("");
+  const [leadName, setLeadName] = useState("");
+  const [leadPhone, setLeadPhone] = useState("");
+  function submitLead(e: FormEvent) {
+    e.preventDefault();
+    const subject = encodeURIComponent(`[서동 견적 문의] ${leadCar.trim() || "차종 미정"}`);
+    const body = encodeURIComponent(
+      `차종: ${leadCar.trim() || "미정"}\n성함: ${leadName.trim() || "미입력"}\n연락처: ${leadPhone.trim() || "미입력"}`,
+    );
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+    window.open(KAKAO_URL, "_blank", "noopener,noreferrer");
+  }
 
   // 예산 흐름
   const [budget, setBudget] = useState(1_000_000);
@@ -918,6 +939,7 @@ export default function QuoteApp() {
       .filter(
         (g) =>
           (!activeBrand || g.brand === activeBrand) &&
+          (!originTab || DOMESTIC_BRANDS.has(g.brand) === (originTab === "domestic")) &&
           (!q ||
             g.name.toLowerCase().includes(q) ||
             g.brand.toLowerCase().includes(q) ||
@@ -925,7 +947,7 @@ export default function QuoteApp() {
             g.trims.some((t) => t.display.toLowerCase().includes(q))),
       )
       .slice(0, 30);
-  }, [groups, query, activeBrand]);
+  }, [groups, query, activeBrand, originTab]);
 
   // 2단계: 그룹을 골랐을 때 그 안의 트림들 — 검색어가 있으면 트림명으로도
   // 다시 좁혀준다(그룹 안에 트림이 많을 때 유용).
@@ -1125,6 +1147,7 @@ export default function QuoteApp() {
   function setSearchBrand(next: string | null) {
     setActiveBrand(next);
     setActiveGroup(null);
+    if (next) setOriginTab(DOMESTIC_BRANDS.has(next) ? "domestic" : "import");
   }
 
   function pickRecommendation(next: IndexedVehicle) {
@@ -1145,10 +1168,13 @@ export default function QuoteApp() {
           <div className="landing-inner landing-header-row">
             <Wordmark />
             <nav className="landing-nav">
+              <a className="landing-navlink" href="#brands">브랜드</a>
+              <a className="landing-navlink" href="#journey">동행 3단계</a>
+              <a className="landing-navlink" href="#search">차량 검색</a>
+              <a className="landing-navlink" href="#faq">자주 묻는 질문</a>
               <ThemeToggle />
-              <button type="button" className="landing-nav-cta" onClick={() => navigate("home")}>
-                견적 시작하기
-              </button>
+              <a className="landing-nav-ghost" href={`tel:${CONTACT_PHONE}`}>전화문의</a>
+              <a className="landing-nav-cta" href="#lead">빠른 견적</a>
             </nav>
           </div>
         </header>
@@ -1156,194 +1182,303 @@ export default function QuoteApp() {
         <section className="landing-hero landing-hero-compact">
           <div className="landing-inner landing-hero-split">
             <div className="landing-hero-text">
+              <p className="landing-hero-eyebrow">차량 생애주기를 함께 걷는 동행자</p>
               <h1>
-                차, <em>혼자 알아보지 마세요</em>
+                차, <em>혼자 고민하지 마세요</em>
               </h1>
               <p className="landing-hero-sub">
-                장기렌트·리스·법인 리스, 서동이 같이 비교해드립니다
+                견적부터 만기 처리까지 함께 걷습니다 — 여러 캐피탈사 실시간 최저가 비교 &amp; 생애주기 1:1 케어
               </p>
               <div className="landing-hero-badges">
                 <span>취급 차량 {index.length.toLocaleString("ko-KR")}+</span>
                 <span>취급 브랜드 {brands.length}개</span>
-                <span>제휴 금융사 3곳</span>
+                <span>제휴 캐피탈사 3곳</span>
               </div>
             </div>
             <JourneyIllustration className="landing-hero-illust" />
           </div>
-
-          {/* 히어로가 곧 진입점 — 글자만 있는 히어로 대신 세 갈래 문을 둔다.
-              고객이 어느 단계에 있든(차를 정했든/예산만 있든/아무것도 모르든)
-              첫 화면에서 바로 자기 자리를 고를 수 있게. */}
-          <div className="landing-inner">
-            <div className="door-grid">
-              <button type="button" className="door-card" onClick={() => navigate("home")}>
-                <span className="door-title">차는 정했어요</span>
-                <span className="door-desc">차명으로 바로 검색</span>
-                <span className="door-go">검색하기 →</span>
-              </button>
-              <button type="button" className="door-card" onClick={() => navigate("budget")}>
-                <span className="door-title">예산부터 볼게요</span>
-                <span className="door-desc">월 예산으로 찾기</span>
-                <span className="door-go">예산 입력 →</span>
-              </button>
-              <a
-                className="door-card door-card-kakao"
-                href={KAKAO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span className="door-title">잘 모르겠어요</span>
-                <span className="door-desc">카톡으로 물어보기</span>
-                <span className="door-go">💬 상담하기 →</span>
-              </a>
-            </div>
-          </div>
         </section>
 
-        <section className="landing-section landing-journey">
+        <section className="landing-section landing-brands" id="brands">
           <div className="landing-inner">
             <div className="landing-sec-head">
               <div>
-                <h2>서동의 동행 3단계</h2>
-                <p className="landing-sec-desc">비교로 끝나는 서비스가 아니라, 계약 이후까지 책임지는 파트너십입니다</p>
+                <h2>{brands.length}개 브랜드를 한 곳에서</h2>
+                <p className="landing-sec-desc">국산·수입 인기 브랜드를 바로 둘러보세요</p>
               </div>
             </div>
-            <ol className="journey-steps">
-              <li>
-                <span className="journey-step-no">1</span>
-                <b>비교</b>
-                <span>여러 금융사 견적을 실시간으로 모아서 보여드려요. 혼자 알아보지 않아도 돼요.</span>
-                <ul>
-                  <li>잔존가치·초기 비용·총 납부액까지 계산 근거 전체 공개</li>
-                  <li>리스·렌트 상품을 조건별로 한 화면에서 비교</li>
-                </ul>
-              </li>
-              <li>
-                <span className="journey-step-no">2</span>
-                <b>계약</b>
-                <span>조건이 정해지면 서류 준비부터 인도까지, 헷갈리는 부분을 같이 짚어드려요.</span>
-                <ul>
-                  <li>오픈카톡으로 필요 서류·일정 안내</li>
-                  <li>계약서 조항 중 궁금한 부분 바로 질문 가능</li>
-                </ul>
-              </li>
-              <li>
-                <span className="journey-step-no">3</span>
-                <b>동행</b>
-                <span>계약이 끝난 뒤에도 만기·재계약 시점에 서동이 먼저 연락드려요.</span>
-                <ul>
-                  <li>만기·재계약 시점에 먼저 연락</li>
-                  <li>계약 기간 중 문의는 언제든 오픈카톡으로</li>
-                </ul>
-              </li>
-            </ol>
+            <div className="brand-grid">
+              {(showAllBrands ? brands : brands.slice(0, 10)).map((b) => (
+                <button
+                  key={b}
+                  type="button"
+                  className="brand-grid-item"
+                  onClick={() => {
+                    setSearchBrand(b);
+                    document.getElementById("search")?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
+                  <BrandLogo brand={b} size="lg" />
+                  <span>{b}</span>
+                </button>
+              ))}
+            </div>
+            {!showAllBrands && brands.length > 10 && (
+              <div className="brand-more-row">
+                <button type="button" onClick={() => setShowAllBrands(true)}>
+                  + {brands.length - 10}개 브랜드 더 보기 →
+                </button>
+              </div>
+            )}
           </div>
         </section>
 
-        {purposePicks.length > 0 && (
-          <section className="landing-section">
-            <div className="landing-inner">
+        <section className="landing-section landing-journey" id="journey">
+          <div className="landing-inner landing-journey-layout">
+            <div className="landing-journey-col">
               <div className="landing-sec-head">
                 <div>
-                  <h2>이런 차 찾으세요?</h2>
-                  <p className="landing-sec-desc">
-                    48개월 · 보증금 30% 기준 실시간 계산가 · 클릭하면 트림 선택 → 최저가 비교로 이동
-                  </p>
+                  <h2>서동의 동행 3단계</h2>
                 </div>
               </div>
-              <div className="purpose-grid">
-                {purposePicks.map(({ label, desc, pick }) => (
-                  <button
-                    key={label}
-                    type="button"
-                    className="purpose-card"
-                    onClick={() => pickVehicle(pick.vehicle)}
-                  >
-                    <span className="purpose-label">{label}</span>
-                    <span className="purpose-desc">{desc}</span>
-                    <VehiclePhoto brand={pick.vehicle.brand} src={pick.vehicle.image} />
-                    <span className="purpose-name">{pick.vehicle.display}</span>
-                    <span className="purpose-cond">
-                      {DEAL_EXPLAIN[pick.deal].name} · 48개월
-                      {pick.sourceCount > 1 ? ` · ${pick.sourceCount}사 비교` : ""}
-                    </span>
-                    <span className="purpose-price">
-                      월 <b>{won(pick.monthlyPayment)}</b>원부터
-                    </span>
-                  </button>
-                ))}
-              </div>
+              <p className="journey-intro">
+                <b>서로</b>의 상황에 맞는 상품을 찾고, 계약 이후에도 끝까지 <b>동행</b>합니다.
+                잔존가치·수수료 근거는 전 과정 <b>투명</b>하게 공개해요 — &quot;서동&quot;이라는 이름 그대로예요.
+              </p>
+              <ol className="journey-steps journey-steps-flat">
+                <li>
+                  <span className="journey-step-no">1</span>
+                  <b>비교</b>
+                  <span>
+                    여러 캐피탈사 견적을 실시간으로 모아서 보여드려요. 잔존가치·초기비용·총납부액까지
+                    계산 근거 전체 공개.
+                  </span>
+                </li>
+                <li>
+                  <span className="journey-step-no">2</span>
+                  <b>계약</b>
+                  <span>조건이 정해지면 서류 준비부터 인도까지, 헷갈리는 부분을 같이 짚어드려요.</span>
+                </li>
+                <li>
+                  <span className="journey-step-no">3</span>
+                  <b>동행</b>
+                  <span>
+                    계약 기간 내내 곁에 있어요 — 고장·정비·사고 처리부터 재계약·추가 견적까지, 만기가
+                    아니어도 언제든 연락 주세요. 만기 6개월 전에는 저희가 먼저 연락드려요.
+                  </span>
+                  <em className="journey-step-tag">계약 기간 내내 상시 지원</em>
+                </li>
+              </ol>
             </div>
-          </section>
-        )}
-
-        {chatExample && (
-          <section className="landing-section landing-chat">
-            <div className="landing-inner">
-              <div className="landing-sec-head">
-                <div>
-                  <h2>이렇게 물어보시면 됩니다</h2>
+            {chatExample && (
+              <div className="landing-chat-col">
+                <div className="chat-card">
+                  <h3>이렇게 물어보시면 됩니다</h3>
                   <p className="landing-sec-desc">
                     복잡한 양식 없이 카톡으로 편하게 — 아래 금액은 지금 실제로 계산된 값이에요
                   </p>
-                </div>
-              </div>
-              <div className="chat-thread">
-                <div className="chat-row chat-them">
-                  <span className="chat-bubble">{chatExample.name} 리스로 하면 얼마예요?</span>
-                </div>
-                <div className="chat-row chat-us">
-                  <span className="chat-who">서동</span>
-                  <span className="chat-bubble">
-                    48개월·연 2만km 기준으로 비교해봤어요. 최저 월 {won(chatExample.withDeposit)}원입니다
-                  </span>
-                </div>
-                <div className="chat-row chat-them">
-                  <span className="chat-bubble">보증금 낮추면요?</span>
-                </div>
-                <div className="chat-row chat-us">
-                  <span className="chat-who">서동</span>
-                  <span className="chat-bubble">
-                    보증금 0%면 월 {won(chatExample.noDeposit)}원이에요. 어느 쪽이 편하세요?
-                  </span>
-                </div>
-              </div>
-              <a
-                className="landing-kakao-btn chat-cta"
-                href={KAKAO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                💬 이렇게 물어보기
-              </a>
-            </div>
-          </section>
-        )}
-
-        {/* "왜 서동인가" 3가지 문구는 위쪽 "동행 3단계"와 같은 말을 반복해서
-            제거했다(같은 주장이 한 페이지에 두 번 나오면 둘 다 약해진다).
-            실제 수치 지표만 얇은 띠로 남긴다. */}
-        <section className="landing-section landing-features landing-features-compact">
-          <div className="landing-inner">
-            <div className="landing-stats-grid landing-stats-inline landing-stats-solo">
-              {[
-                { num: index.length.toLocaleString("ko-KR"), unit: "+", label: "취급 차량" },
-                { num: String(brands.length), unit: "개", label: "취급 브랜드" },
-                { num: "3", unit: "곳", label: "제휴 금융사" },
-              ].map((s) => (
-                <div key={s.label} className="landing-stat-item">
-                  <div className="landing-stat-num">
-                    {s.num}
-                    <span>{s.unit}</span>
+                  <div className="chat-thread">
+                    <div className="chat-row chat-them">
+                      <span className="chat-bubble">{chatExample.name} 리스로 하면 얼마예요?</span>
+                    </div>
+                    <div className="chat-row chat-us">
+                      <span className="chat-who">서동</span>
+                      <span className="chat-bubble">
+                        48개월·연 2만km 기준으로 비교해봤어요. 최저 월 {won(chatExample.withDeposit)}원입니다
+                      </span>
+                    </div>
+                    <div className="chat-row chat-them">
+                      <span className="chat-bubble">보증금 낮추면요?</span>
+                    </div>
+                    <div className="chat-row chat-us">
+                      <span className="chat-who">서동</span>
+                      <span className="chat-bubble">
+                        보증금 0%면 월 {won(chatExample.noDeposit)}원이에요. 어느 쪽이 편하세요?
+                      </span>
+                    </div>
                   </div>
-                  <div className="landing-stat-label">{s.label}</div>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
         </section>
 
-        <section className="landing-section landing-faq">
+        <section className="landing-section landing-search-inline" id="search">
+          <div className="landing-inner">
+            <div className="landing-sec-head">
+              <div>
+                <h2>이런 차 찾으세요?</h2>
+                <p className="landing-sec-desc">
+                  차명으로 검색하거나 브랜드로 둘러보세요 · 48개월 · 보증금 30% 기준 실시간 계산가
+                </p>
+              </div>
+            </div>
+
+            <div className="landing-search-row">
+              <div className="landing-search-box">
+                <input
+                  type="text"
+                  placeholder="차량명으로 검색 (예: 그랜저, E 300, Model Y)"
+                  value={query}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label="차량 검색"
+                />
+              </div>
+              <div className="landing-origin-tabs">
+                <button
+                  type="button"
+                  className={originTab !== "import" ? "on" : ""}
+                  onClick={() => setOriginTab(originTab === "domestic" ? null : "domestic")}
+                >
+                  국산
+                </button>
+                <button
+                  type="button"
+                  className={originTab === "import" ? "on" : ""}
+                  onClick={() => setOriginTab(originTab === "import" ? null : "import")}
+                >
+                  수입
+                </button>
+              </div>
+            </div>
+
+            <div className="brand-chips landing-hero-chips">
+              {brands.slice(0, 8).map((b) => (
+                <button
+                  key={b}
+                  type="button"
+                  className={`brand-chip${activeBrand === b ? " on" : ""}`}
+                  onClick={() => setSearchBrand(activeBrand === b ? null : b)}
+                >
+                  {b}
+                </button>
+              ))}
+              <button type="button" className="brand-chip" onClick={() => setShowAllBrands(true)}>
+                +{Math.max(brands.length - 8, 0)}개 브랜드
+              </button>
+            </div>
+
+            {activeGroup ? (
+              <>
+                <button type="button" className="group-back" onClick={() => setActiveGroup(null)}>
+                  ← {activeGroup.brand} {activeGroup.name}
+                </button>
+                {trimResults.length > 0 && (
+                  <div className="search-list">
+                    {trimResults.map((v) => {
+                      const { main, pkg } = splitTrimLabel(v.display);
+                      return (
+                        <button key={v.id} type="button" className="search-row trim-row" onClick={() => pickVehicle(v)}>
+                          <span className="search-row-lead">
+                            <span className="search-row-name">
+                              {main}
+                              {pkg && <span className="trim-pkg">{pkg}</span>}
+                            </span>
+                          </span>
+                          <span className="search-row-meta">
+                            {v.displayPrice > 0 ? `차량가 ${man(v.displayPrice)}` : ""}
+                            {v.priceIsEstimate && v.displayPrice > 0 ? "~" : ""}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                {trimResults.length === 0 && <div className="search-empty">검색 결과가 없어요</div>}
+              </>
+            ) : query.trim() || activeBrand ? (
+              <>
+                {groupResults.length > 0 && (
+                  <div className="search-list">
+                    {groupResults.map((g) => (
+                      <button
+                        key={g.id}
+                        type="button"
+                        className="search-row model-group-row"
+                        onClick={() => pickGroup(g)}
+                      >
+                        <span className="search-row-lead">
+                          <BrandLogo brand={g.brand} />
+                          <span className="search-row-name">
+                            <b>{g.brand}</b> {g.name}
+                          </span>
+                        </span>
+                        <span className="search-row-meta">
+                          {g.trimCount > 1 ? `${g.trimCount}개 트림 · ` : ""}
+                          {g.minPrice > 0 ? `${man(g.minPrice)}부터` : ""}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {groupResults.length === 0 && <div className="search-empty">검색 결과가 없어요</div>}
+              </>
+            ) : (
+              purposePicks.length > 0 && (
+                <div className="purpose-grid">
+                  {purposePicks.map(({ label, desc, pick }) => (
+                    <button
+                      key={label}
+                      type="button"
+                      className="purpose-card"
+                      onClick={() => pickVehicle(pick.vehicle)}
+                    >
+                      <span className="purpose-label">{label}</span>
+                      <span className="purpose-desc">{desc}</span>
+                      <VehiclePhoto brand={pick.vehicle.brand} src={pick.vehicle.image} />
+                      <span className="purpose-name">{pick.vehicle.display}</span>
+                      <span className="purpose-cond">
+                        {DEAL_EXPLAIN[pick.deal].name} · 48개월
+                        {pick.sourceCount > 1 ? ` · ${pick.sourceCount}사 비교` : ""}
+                      </span>
+                      <span className="purpose-price">
+                        월 <b>{won(pick.monthlyPayment)}</b>원부터
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )
+            )}
+          </div>
+        </section>
+
+        <section className="landing-cta" id="lead">
+          <div className="landing-inner landing-cta-split">
+            <div className="landing-cta-text">
+              <h2>차량 생애주기,<br />믿을 수 있는 파트너 서동과 시작하세요</h2>
+              <p>3초면 충분해요. 남겨주시면 서동이 먼저 확인하고 카톡으로 연락드립니다.</p>
+            </div>
+            <form className="lead-form" onSubmit={submitLead}>
+              <p className="lead-form-label">3초 견적 신청</p>
+              <div className="lead-row">
+                <input
+                  type="text"
+                  placeholder="어떤 차 보고 계세요? (예: 그랜저, 없어도 OK)"
+                  value={leadCar}
+                  onChange={(e) => setLeadCar(e.target.value)}
+                />
+                <input
+                  type="text"
+                  placeholder="성함"
+                  value={leadName}
+                  onChange={(e) => setLeadName(e.target.value)}
+                />
+                <input
+                  type="tel"
+                  placeholder="연락처 (010-0000-0000)"
+                  value={leadPhone}
+                  onChange={(e) => setLeadPhone(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="lead-submit">💬 입력하고 카톡으로 상담받기</button>
+              <p className="lead-note">
+                제출하면 입력하신 내용이 이메일로 서동에 전달되고, 오픈카톡 상담도 함께 열립니다.
+              </p>
+            </form>
+          </div>
+        </section>
+
+        <section className="landing-section landing-faq" id="faq">
           <div className="landing-inner">
             <div className="landing-sec-head">
               <div>
@@ -1356,13 +1491,6 @@ export default function QuoteApp() {
                 <p>아니요, 견적 비교와 상담 모두 무료예요. 계약 시에도 별도 수수료를 서동에 내지 않아요.</p>
               </details>
               <details>
-                <summary>차를 아직 안 정했는데 상담해도 되나요?</summary>
-                <p>
-                  그럼요, 오히려 그때 상담하시는 게 좋아요. 예산·인원수·주행거리만 알려주시면
-                  어떤 차가 맞을지부터 같이 좁혀드려요. 차종을 정하고 오셔야 하는 건 아니에요.
-                </p>
-              </details>
-              <details>
                 <summary>법인 명의로도 되나요?</summary>
                 <p>
                   네, 법인 리스·장기렌트 모두 취급해요. 개인 명의와 조건이 달라지는 부분이 있어서
@@ -1370,95 +1498,9 @@ export default function QuoteApp() {
                 </p>
               </details>
               <details>
-                <summary>왜 금융사 이름이 바로 안 보이나요?</summary>
-                <p>
-                  비교 단계에서는 회사 이름보다 조건(월 납부액·잔가율·총 납부액)에 집중하실 수 있게
-                  A/B/C사로 표기해요. 실제 회사명은 상담 시 정확히 안내드려요.
-                </p>
+                <summary>만기 관리는 어떻게 되나요?</summary>
+                <p>만기 6개월 전 먼저 연락드려서 인수·반납·재계약 중 유리한 쪽을 같이 정리해드려요.</p>
               </details>
-              <details>
-                <summary>상담은 어떻게 진행되나요?</summary>
-                <p>
-                  오픈카톡으로 편하게 문의하시면 담당 컨설턴트가 조건을 확인하고 다음 단계를
-                  안내해드려요. 전화보다 부담 없이, 원하는 시간에 물어보실 수 있어요.
-                </p>
-              </details>
-              <details>
-                <summary>계약 이후에도 연락이 되나요?</summary>
-                <p>
-                  네, 서동의 정체성이 바로 그 부분이에요. 계약 기간 중 궁금한 건 언제든 오픈카톡으로
-                  물어보시면 되고, 만기·재계약 시점엔 서동이 먼저 연락드려요.
-                </p>
-              </details>
-            </div>
-          </div>
-        </section>
-
-        <section className="landing-section landing-search-secondary">
-          <div className="landing-inner">
-            <p className="landing-row-label">
-              <span className="landing-tag">차량 검색</span>
-              찾는 차가 위에 없나요? 차량명으로 바로 검색하세요
-            </p>
-            <form
-              className="landing-search"
-              onSubmit={(e) => {
-                e.preventDefault();
-                goToSearch(query);
-              }}
-            >
-              <input
-                type="text"
-                placeholder="차량명으로 검색 (예: 그랜저, E 300, Model Y)"
-                value={query}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="차량 검색"
-              />
-              <button type="submit">검색</button>
-            </form>
-            <div className="brand-chips landing-hero-chips">
-              {brands.slice(0, 8).map((b) => (
-                <button
-                  key={b}
-                  type="button"
-                  className="brand-chip"
-                  onClick={() => {
-                    setSearchBrand(b);
-                    navigate("home");
-                  }}
-                >
-                  {b}
-                </button>
-              ))}
-              <button type="button" className="brand-chip" onClick={() => navigate("home")}>
-                +{Math.max(brands.length - 8, 0)}개 브랜드
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className="landing-contact landing-contact-compact">
-          <div className="landing-inner landing-contact-bar">
-            <div className="landing-contact-bar-text">
-              <p className="landing-contact-bar-title">
-                차량명으로 바로 찾거나, 확신이 서면 오픈카톡으로 상담하세요
-              </p>
-              <p className="landing-contact-bar-meta">
-                견적 비교도, 상담도 무료예요
-              </p>
-            </div>
-            <div className="landing-contact-bar-btns">
-              <button type="button" className="landing-nav-cta" onClick={() => navigate("home")}>
-                내 차 견적 만들기
-              </button>
-              <a
-                className="landing-kakao-btn"
-                href={KAKAO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                💬 오픈카톡 상담
-              </a>
             </div>
           </div>
         </section>
