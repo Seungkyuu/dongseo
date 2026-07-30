@@ -883,18 +883,14 @@ export default function QuoteApp() {
   const [originTab, setOriginTab] = useState<"domestic" | "import" | null>(null);
   const [showAllBrands, setShowAllBrands] = useState(false);
 
-  // 랜딩 하단 리드폼 — 저장할 백엔드가 없어서 DB엔 안 남기고, 제출 시
-  // 입력값을 이메일 본문에 채워 서동 메일로 즉시 전달 + 오픈카톡도 같이 연다.
+  // 랜딩 하단 리드폼 — 메일 연동은 하지 않는다(대표님 확정). 카카오 오픈채팅만
+  // 열고, 입력하신 성함·연락처는 안내 문구대로 채팅으로 직접 보내주시는 흐름.
+  // (백엔드가 없어 자동 전송은 불가 — 탑고와 동일한 방식으로 맞춘다.)
   const [leadCar, setLeadCar] = useState("");
   const [leadName, setLeadName] = useState("");
   const [leadPhone, setLeadPhone] = useState("");
   function submitLead(e: FormEvent) {
     e.preventDefault();
-    const subject = encodeURIComponent(`[서동 견적 문의] ${leadCar.trim() || "차종 미정"}`);
-    const body = encodeURIComponent(
-      `차종: ${leadCar.trim() || "미정"}\n성함: ${leadName.trim() || "미입력"}\n연락처: ${leadPhone.trim() || "미입력"}`,
-    );
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
     window.open(KAKAO_URL, "_blank", "noopener,noreferrer");
   }
 
@@ -1192,12 +1188,12 @@ export default function QuoteApp() {
                 차, <em>혼자 고민하지 마세요</em>
               </h1>
               <p className="landing-hero-sub">
-                견적부터 만기 처리까지 함께 걷습니다 — 여러 캐피탈사 실시간 최저가 비교 &amp; 생애주기 1:1 케어
+                견적부터 만기 처리까지 — 여러 캐피탈사 실시간 최저가 비교와 생애주기 1:1 케어
               </p>
               <div className="landing-hero-badges">
                 <span>취급 차량 {index.length.toLocaleString("ko-KR")}+</span>
                 <span>취급 브랜드 {brands.length}개</span>
-                <span>제휴 캐피탈사 3곳</span>
+                <span>제휴 캐피탈사 긴밀 협업</span>
               </div>
             </div>
             <JourneyIllustration className="landing-hero-illust" />
@@ -1247,8 +1243,8 @@ export default function QuoteApp() {
                 </div>
               </div>
               <p className="journey-intro">
-                <b>서로</b>의 상황에 맞는 상품을 찾고, 계약 이후에도 끝까지 <b>동행</b>합니다.
-                잔존가치·수수료 근거는 전 과정 <b>투명</b>하게 공개해요 — &quot;서동&quot;이라는 이름 그대로예요.
+                고객님의 상황에 맞는 상품을 찾고, 계약 이후에도 끝까지 <b>동행</b>합니다.
+                잔존가치·수수료 근거는 전 과정 <b>투명</b>하게 공개해요.
               </p>
               <ol className="journey-steps-flat">
                 <li>
@@ -1274,8 +1270,8 @@ export default function QuoteApp() {
                     <b>동행</b>
                   </div>
                   <p>
-                    계약 기간 내내 곁에 있어요 — 고장·정비·사고 처리부터 재계약·추가 견적까지, 만기가
-                    아니어도 언제든 연락 주세요. 만기 6개월 전에는 저희가 먼저 연락드려요.
+                    계약 기간 내내 곁에 있어요 — 고장·정비·사고 처리부터 재계약·추가 견적까지.
+                    만기 6개월 전에는 저희가 먼저 연락드립니다.
                   </p>
                   <em className="journey-step-tag">계약 기간 내내 상시 지원</em>
                 </li>
@@ -1483,7 +1479,7 @@ export default function QuoteApp() {
               </div>
               <button type="submit" className="lead-submit">💬 입력하고 카톡으로 상담받기</button>
               <p className="lead-note">
-                제출하면 입력하신 내용이 이메일로 서동에 전달되고, 오픈카톡 상담도 함께 열립니다.
+                제출하면 카카오톡 오픈채팅방이 열려요. 입력하신 성함·연락처를 채팅으로 보내주시면 바로 상담해드립니다.
               </p>
             </form>
           </div>
