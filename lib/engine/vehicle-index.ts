@@ -20,6 +20,7 @@ import { listRentalVehicles } from "./meritz-rental-domestic";
 import { listImportRentalVehicles } from "./meritz-rental-import";
 import { listBnkVehicles } from "./bnk";
 import { listMgRentalVehicles } from "./mg-rental";
+import { listMgLeaseVehicles } from "./mg-lease";
 import teslaVehiclesJson from "./meritz-tesla/data/vehicles.json";
 import bydVehiclesJson from "./meritz-byd/data/vehicles.json";
 import shinhanRentalJson from "./shinhan/data/rental-vehicles.json";
@@ -301,6 +302,10 @@ export function buildVehicleIndex(): IndexedVehicle[] {
     const display = key.replace(/_/g, " ");
     const brand = GENESIS_PATTERN.test(display) ? "제네시스" : v.brand.replace(/자동차$/, "");
     add(brand, display, "mg-rental", importRealPrice(key, approxPrice(key, 50_000_000)));
+  }
+  // MG캐피탈 — 운용리스(235개 모델, 브랜드는 카탈로그에 이미 정확히 들어있음)
+  for (const [key, v] of listMgLeaseVehicles()) {
+    add(v.brand, key, "mg-lease", importRealPrice(key, approxPrice(key, v.vehiclePrice)));
   }
 
   // ─── 소스 간 병합(겟챠 등급 식별자 기준) ─────────────────────────────────

@@ -34,6 +34,7 @@ import { quoteMeritzDomesticRental, findRentalVehicle } from "./meritz-rental-do
 import { quoteMeritzImportRental, findImportRentalVehicle } from "./meritz-rental-import";
 import { quoteBnkOperatingLease, findBnkVehicle } from "./bnk";
 import { quoteMgRental, findMgRentalVehicle } from "./mg-rental";
+import { quoteMgLease, findMgLeaseVehicle } from "./mg-lease";
 import { quoteMeritzTeslaLease, findTeslaVehicle } from "./meritz-tesla";
 import { quoteMeritzBydLease, findBydVehicle } from "./meritz-byd";
 import type { MeritzEvLeaseQuote } from "./meritz-ev/lease";
@@ -379,6 +380,29 @@ function mgRentalQuote(id: string, deal: DealType, input: CapitalQuoteInput): Ca
   }
 }
 
+function mgLeaseQuote(id: string, deal: DealType, input: CapitalQuoteInput): CapitalQuoteRow {
+  const capital = "MG캐피탈";
+  try {
+    if (deal !== "operatingLease") {
+      return { capital, sourceId: id, available: false, note: "미취급" };
+    }
+    const q = quoteMgLease({
+      model: input.model,
+      vehiclePrice: input.vehiclePrice,
+      termMonths: input.termMonths,
+      depositRate: input.depositRate,
+    });
+    return {
+      capital, sourceId: id, available: true,
+      monthlyPayment: q.monthlyPayment, annualRate: q.annualRate,
+      customerRate: q.customerRate, residualRate: q.residualRate,
+      residualValue: q.residualValue, deposit: 0, prepayment: 0,
+    };
+  } catch (e) {
+    return { capital, sourceId: id, available: false, note: e instanceof Error ? e.message : "계산 불가" };
+  }
+}
+
 function evLeaseQuote(
   id: string,
   quoteFn: (input: {
@@ -489,6 +513,14 @@ export const QUOTE_SOURCES: QuoteSource[] = [
     deals: ["longTermRental"],
     handles: (m) => findMgRentalVehicle(m) !== null,
     quote: (deal, input) => mgRentalQuote("mg-rental", deal, input),
+  },
+  {
+    id: "mg-lease",
+    capital: "MG캐피탈",
+    label: "운용리스",
+    deals: ["operatingLease"],
+    handles: (m) => findMgLeaseVehicle(m) !== null,
+    quote: (deal, input) => mgLeaseQuote("mg-lease", deal, input),
   },
   {
     id: "meritz-tesla-lease",

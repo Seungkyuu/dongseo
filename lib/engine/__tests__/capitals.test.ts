@@ -29,6 +29,7 @@ describe("소스(엑셀) 레지스트리 — 근본 원칙", () => {
       "meritz-rental-import",
       "bnk-operating-lease",
       "mg-rental",
+      "mg-lease",
       "meritz-tesla-lease",
       "meritz-byd-lease",
     ]);
