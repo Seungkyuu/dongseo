@@ -43,7 +43,7 @@ const man = (n: number) => `${Math.round(n / 10_000).toLocaleString("ko-KR")}만
  *  거친다. 실제 회사 수(ALL_CAPITALS)와 무관하게 항상 같은 3개 라벨로 매핑돼
  *  있어 제휴사가 늘어나도 새 실명이 그대로 뚫려 나가지 않는다(모르는 이름은
  *  "제휴사"로 안전하게 폴백). */
-const CAPITAL_DISPLAY: Record<string, string> = { 오릭스: "A사", 신한카드: "B사", 메리츠: "C사", BNK캐피탈: "D사" };
+const CAPITAL_DISPLAY: Record<string, string> = { 오릭스: "A사", 신한카드: "B사", 메리츠: "C사", BNK캐피탈: "D사", MG캐피탈: "E사" };
 function anonCapital(capital: string): string {
   return CAPITAL_DISPLAY[capital] ?? "제휴사";
 }
