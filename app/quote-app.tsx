@@ -96,7 +96,7 @@ const BUDGET_PRESETS = [500_000, 700_000, 1_000_000, 1_500_000];
 
 const KAKAO_URL = "https://open.kakao.com/o/s2R3r8Fi";
 const BLOG_URL = "https://blog.naver.com/leenkim_lease_";
-const CONTACT_PHONE = "010-5008-7722";
+const CONTACT_PHONE = "010-7279-2866";
 const CONTACT_EMAIL = "seodong_car@gmail.com";
 const CONTACT_FAX = "0504-391-5100";
 
